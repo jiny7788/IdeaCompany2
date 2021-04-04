@@ -1,0 +1,46 @@
+info:
+  app:
+    name: @project.artifactId@
+    description: @project.description@
+    version: @project.version@
+    domain: ideacomany.com
+    
+server:
+  port: 8080
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+      
+spring:
+  application:
+    name: @project.artifactId@
+  http:
+    cookie:
+      secure: true    
+
+etm:
+  redis:
+    login-token:
+      host: 127.0.0.1
+      port: 6379
+      database: 10
+      
+zuul:
+  sensitiveHeaders: Cookie,Set-Cookie,Authorization
+  ribbon-isolation-strategy: THREAD
+  host:
+    socket-timeout-millis: 300000
+    max-per-route-connections: 256
+    max-total-connections: 256
+  threadPool:
+    useSeparateThreadPools: true
+  routes:    etm-svc-control:
+      path: /control/**
+      strip-prefix: false  
+    etm-auth-control:
+      path: /authkeys/**
+      strip-prefix: false

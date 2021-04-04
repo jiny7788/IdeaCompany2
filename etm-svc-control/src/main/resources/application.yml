@@ -1,0 +1,19 @@
+info:
+  app:
+    name: @project.artifactId@
+    description: @project.description@
+    version: @project.version@
+    
+server:
+  port: 8090
+
+spring:
+  application:
+    name: @project.artifactId@
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
