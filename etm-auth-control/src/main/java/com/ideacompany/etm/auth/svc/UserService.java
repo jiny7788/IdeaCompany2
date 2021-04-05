@@ -3,16 +3,26 @@ package com.ideacompany.etm.auth.svc;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ideacompany.etm.auth.ctl.UserController;
 import com.ideacompany.etm.auth.dto.CommonResponse;
 import com.ideacompany.etm.auth.dto.LoginDto;
 import com.ideacompany.etm.auth.dto.LoginFormDto;
+import com.ideacompany.etm.auth.map.UserMapper;
 
 @Service
 public class UserService {
+	
+	private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+	
+	@Autowired
+	private UserMapper userMapper;
 
-	public CommonResponse loginUsr(LoginFormDto dto, boolean isLoginToken) { //throws DspCheckedException {
+	public CommonResponse loginUser(LoginFormDto dto, boolean isLoginToken) throws Exception {
 
         Map<String, Object> rtn = new HashMap<String, Object>();
 
@@ -22,6 +32,8 @@ public class UserService {
         } else {
             //isPasswordMatch = checkPasswordMatch(dto.getUserId(), dto.getPwd(), true);
         }
+        
+        logger.info(userMapper.getUser());
 
 //        LoginDto succObj = loginUser(dto, isPasswordMatch);
         LoginDto succObj = new LoginDto(); 

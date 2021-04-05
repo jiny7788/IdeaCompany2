@@ -28,8 +28,8 @@ public class UserController {
 	
 	@ApiOperation("사용자 LOGIN(토큰발급)")
     @PostMapping("/log_in")
-    public @ResponseBody CommonResponse loginUsr(@RequestBody LoginFormDto dto) { // throws DspCheckedException {
-        return userService.loginUsr(dto, false);
+    public @ResponseBody CommonResponse loginUser(@RequestBody LoginFormDto dto) throws Exception {
+        return userService.loginUser(dto, false);
     }
 
 }
