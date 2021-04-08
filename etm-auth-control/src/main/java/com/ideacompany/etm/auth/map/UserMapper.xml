@@ -1,14 +1,11 @@
-?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
-<mapper namespace="com.ideacompany.etm.map.UserMapper">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ideacompany.etm.auth.map.UserMapper">
 
 	<select id="getUser" resultType="string">
 		select 
-			name
-		from mytest.user
+			user_id
+		from secuiot.tb_user_mstr
+		limit 1
 	</select>
 
 </mapper>

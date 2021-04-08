@@ -10,6 +10,15 @@ server:
 spring:
   application:
     name: @project.artifactId@
+  datasource:
+    hikari:
+      driver-class-name: org.postgresql.Driver
+      jdbc-url: jdbc:postgresql://db.internal.secudiumiot.com:5432/secuiot
+      username: secuiot_app
+      password: app1q2w3e4r
+      minimumIdle: 30
+      maximumPoolSize: 30
+      connectionTestQuery: select 1
 
 eureka:
   client:
@@ -18,6 +27,7 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka
       
+          
 etm:
   accesskey:
     valid-interval: 300000
