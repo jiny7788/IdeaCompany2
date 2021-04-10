@@ -38,9 +38,3 @@ zuul:
     max-total-connections: 256
   threadPool:
     useSeparateThreadPools: true
-  routes:    etm-svc-control:
-      path: /control/**
-      strip-prefix: false  
-    etm-auth-control:
-      path: /authkeys/**
-      strip-prefix: false

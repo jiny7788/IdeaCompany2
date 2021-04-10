@@ -3,8 +3,8 @@
 
 	<select id="getUser" resultType="string">
 		select 
-			user_id
-		from secuiot.tb_user_mstr
+			name
+		from mytest.user
 		limit 1
 	</select>
 

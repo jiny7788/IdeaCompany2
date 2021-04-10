@@ -151,7 +151,7 @@ public class PreFilter extends ZuulFilter {
             timeStamp = (String) session.getAttribute("TIME_STAMP");
             ctx.addZuulRequestHeader("timeStamp", timeStamp);
         }
-        
+        	
         return null;
     }
     
@@ -171,8 +171,9 @@ public class PreFilter extends ZuulFilter {
             
             if(firstDepth != null) {
             	switch(firstDepth) {
-            	case "log_in" :
-            	case "log_out" :
+            	case "log_in":
+            	case "log_out":
+            	case "api-docs":
             		return true;
             	}            	
             }            	
