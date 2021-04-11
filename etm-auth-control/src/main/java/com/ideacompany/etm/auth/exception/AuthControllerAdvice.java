@@ -29,4 +29,19 @@ public class AuthControllerAdvice {
 
         return new ResponseEntity<>(commonResponse, HttpStatus.BAD_REQUEST);
     }
+    
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<CommonResponse> runtimeException(RuntimeException e) {
+
+        return error(e, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    
+    private <E extends Exception> ResponseEntity<CommonResponse> error(final E exception, final HttpStatus httpStatus) {
+        logger.error(exception.getMessage(), exception);
+        CommonResponse commonResponse = new CommonResponse();
+        commonResponse.setCode(httpStatus.toString());
+        commonResponse.setMessage("error occurred");
+        commonResponse.setResponseTime(new SimpleDateFormat("yyyy-MM-ddHH:mm:ss").format(new Date()));
+        return new ResponseEntity<>(commonResponse, httpStatus);
+    }
 }

@@ -29,7 +29,7 @@ public class EtmSvcControlApplication {
 
 
 @RestController
-@RequestMapping(path = "/control/")
+@RequestMapping(path = "/test/")
 class GreetingController {
 	private static final Logger logger = LoggerFactory.getLogger(GreetingController.class);
 
