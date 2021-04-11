@@ -21,8 +21,8 @@ public class LoginDto {
     @ApiModelProperty(value = "사용자성명")
     private String  userName;
 
-    @ApiModelProperty(value = "비밀번호 - json에서는 제외됨")
-    @JsonIgnore
+    @ApiModelProperty(value = "비밀번호")
+    @JsonIgnore		// Json에서 제외시킴
     private String  pwd;
 
     @ApiModelProperty(value = "비밀번호 오류 횟수")
@@ -43,15 +43,6 @@ public class LoginDto {
     @ApiModelProperty(value = "사용여부")
     private String  useYn;
 
-    @ApiModelProperty(value = "부서")
-    private String  deptName;
-
-    @ApiModelProperty(value = "직위")
-    private String  positName;
-
-    @ApiModelProperty(value = "직책")
-    private String  dutiName;
-
     @ApiModelProperty(value = "잠김 여부")
     private String  lockYn;
 
@@ -60,10 +51,4 @@ public class LoginDto {
     
     @ApiModelProperty(value = "비밀번호 수정날짜")
     private String  pwdModDate;
-
-    @ApiModelProperty(value = "서비스 만료 여부")
-    private boolean serviceExpireYn;
-    
-    @ApiModelProperty(value ="사용자 권한 프로파일 ")
-    private String userProfileName;
 }

@@ -1,11 +1,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ideacompany.etm.auth.map.UserMapper">
 
-	<select id="getUser" resultType="string">
-		select 
-			name
-		from mytest.user
-		limit 1
+	<select id="loginUser" parameterType="com.ideacompany.etm.auth.dto.LoginFormDto" resultType="com.ideacompany.etm.auth.dto.LoginDto">
+		SELECT 
+			user_no, user_id, user_email, user_name, pwd, pwd_err_cnt, user_status_code, user_dstnct_code, use_yn, 
+			coalesce(lock_yn, 'N') as lock_yn, lock_text
+		FROM mytest.tb_user_mstr
+		WHERE use_yn='Y'
+			AND user_id = #{userId}
 	</select>
 
+	<update id="saveRefreshToken" parameterType="com.ideacompany.etm.auth.dto.SaveRefreshTokenDto">
+		update	mytest.tb_user_mstr
+		   set	lock_text = #{lockText}
+		 where	user_no = #{userNo}
+	</update>
+	
 </mapper>
