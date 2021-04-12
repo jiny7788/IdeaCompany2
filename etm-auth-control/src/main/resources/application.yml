@@ -1,19 +1,19 @@
 info:
   app:
-    name: @project.artifactId@
-    description: @project.description@
-    version: @project.version@
+    name: ^project.artifactId^
+    description: ^project.description^
+    version: ^project.version^
     
 server:
   port: 8091
 
 spring:
   application:
-    name: @project.artifactId@
+    name: ^project.artifactId^
   db:
     hikari:
       driver-class-name: org.postgresql.Driver
-      jdbc-url: jdbc:postgresql://127.0.0.1:5432/mytestdb
+      jdbc-url: jdbc:postgresql://10.250.238.179:5432/mytestdb
       username: mytest
       password: a12345!
       minimumIdle: 30

@@ -1,14 +1,14 @@
 info:
   app:
-    name: @project.artifactId@
-    description: @project.description@
-    version: @project.version@
+    name: ^project.artifactId^
+    description: ^project.description^
+    version: ^project.version^
     
 server:
   port: 8761
 spring:
   application:
-    name: @project.artifactId@
+    name: ^project.artifactId^
 eureka:
   client:
     service-url:
