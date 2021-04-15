@@ -1,0 +1,61 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: etm-auth-control
+  labels:
+    component: etm-auth-control
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: etm-auth-control
+  template:
+    metadata:
+      labels:
+        component: etm-auth-control
+    spec:
+      hostAliases:
+      - ip: "10.250.238.35"
+        hostnames:
+        - "registry.secuiot"
+      - ip: "10.250.238.179"
+        hostnames:
+        - "db.internal.ideacompany.com"
+      containers:
+      - name: etm-auth-control
+#        imagePullPolicy: Always
+        image: registry.secuiot/etm-auth-control:202104151
+        resources:
+          requests:
+            memory: "1024Mi"
+          limits:
+            memory: "2048Mi"
+        env:
+        - name: JVM_OPTS
+          value: "-Xms1024M -Xmx1024M -XX:MetaspaceSize=192M -XX:MaxMetaspaceSize=1024m"
+        ports:
+        - containerPort: 8091
+          name: http
+        volumeMounts:
+          - name: secuiotlogs
+            mountPath: /secuiot_logs
+      volumes:
+        - hostPath:
+            path: /secuiot_logs
+          name: secuiotlogs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: etm-auth-control-cs
+  labels:
+    component: etm-auth-control
+spec:
+  selector:
+    component: etm-auth-control
+  ports:
+  - protocol: "TCP"
+    port: 8091
+    targetPort: 8091
+    name: etm-auth-control-8091
+  type: ClusterIP

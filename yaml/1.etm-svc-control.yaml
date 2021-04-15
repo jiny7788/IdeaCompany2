@@ -1,0 +1,61 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: etm-svc-control
+  labels:
+    component: etm-svc-control
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: etm-svc-control
+  template:
+    metadata:
+      labels:
+        component: etm-svc-control
+    spec:
+      hostAliases:
+      - ip: "10.250.238.35"
+        hostnames:
+        - "registry.secuiot"
+      - ip: "10.250.238.179"
+        hostnames:
+        - "db.internal.ideacompany.com"
+      containers:
+      - name: etm-svc-control
+#        imagePullPolicy: Always
+        image: registry.secuiot/etm-svc-control:202104151
+        resources:
+          requests:
+            memory: "1024Mi"
+          limits:
+            memory: "2048Mi"
+        env:
+        - name: JVM_OPTS
+          value: "-Xms1024M -Xmx1024M -XX:MetaspaceSize=192M -XX:MaxMetaspaceSize=1024m"
+        ports:
+        - containerPort: 8090
+          name: http
+        volumeMounts:
+          - name: secuiotlogs
+            mountPath: /secuiot_logs
+      volumes:
+        - hostPath:
+            path: /secuiot_logs
+          name: secuiotlogs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: etm-svc-control-cs
+  labels:
+    component: etm-svc-control
+spec:
+  selector:
+    component: etm-svc-control
+  ports:
+  - protocol: "TCP"
+    port: 8090
+    targetPort: 8090
+    name: etm-svc-control-8090
+  type: ClusterIP

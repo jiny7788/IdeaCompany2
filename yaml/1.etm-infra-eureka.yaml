@@ -1,0 +1,61 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: etm-infra-eureka
+  labels:
+    component: etm-infra-eureka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: etm-infra-eureka
+  template:
+    metadata:
+      labels:
+        component: etm-infra-eureka
+    spec:
+      hostAliases:
+      - ip: "10.250.238.35"
+        hostnames:
+        - "registry.secuiot"
+      - ip: "10.250.238.179"
+        hostnames:
+        - "db.internal.ideacompany.com"
+      containers:
+      - name: etm-infra-eureka
+#        imagePullPolicy: Always
+        image: registry.secuiot/etm-infra-eureka:202104151
+        resources:
+          requests:
+            memory: "1024Mi"
+          limits:
+            memory: "2048Mi"
+        env:
+        - name: JVM_OPTS
+          value: "-Xms1024M -Xmx1024M -XX:MetaspaceSize=192M -XX:MaxMetaspaceSize=1024m"
+        ports:
+        - containerPort: 8761
+          name: http
+        volumeMounts:
+          - name: secuiotlogs
+            mountPath: /secuiot_logs
+      volumes:
+        - hostPath:
+            path: /secuiot_logs
+          name: secuiotlogs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: etm-infra-eureka-cs
+  labels:
+    component: etm-infra-eureka
+spec:
+  selector:
+    component: etm-infra-eureka
+  ports:
+  - protocol: "TCP"
+    port: 8761
+    targetPort: 8761
+    name: etm-infra-eureka-8761
+  type: ClusterIP

@@ -1,0 +1,15 @@
+# 사용 안함
+apiVersion: v1
+kind: Service
+metadata:
+  name: etm-auth-control-lb
+  labels:
+    component: etm-auth-control
+spec:
+  selector:
+    component: etm-auth-control
+  ports:
+  - protocol: "TCP"
+    port: 8091
+    targetPort: 8091
+  type: LoadBalancer

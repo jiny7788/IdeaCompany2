@@ -1,0 +1,17 @@
+# 사용 안함
+apiVersion: v1
+kind: Service
+metadata:
+  name: etm-infra-gateway-lb
+  labels:
+    component: etm-infra-gateway
+spec:
+  selector:
+    component: etm-infra-gateway
+  ports:
+  - protocol: "TCP"
+    port: 8080
+    targetPort: 8080
+  type: LoadBalancer
+  externalIPs:
+    - 10.250.238.36

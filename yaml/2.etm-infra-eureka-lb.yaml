@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: etm-infra-eureka-lb
+  labels:
+    component: etm-infra-eureka
+spec:
+  selector:
+    component: etm-infra-eureka
+  ports:
+  - protocol: "TCP"
+    port: 8761
+    targetPort: 8761
+  type: LoadBalancer
