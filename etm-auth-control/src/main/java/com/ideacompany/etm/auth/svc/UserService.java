@@ -5,18 +5,13 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.ideacompany.etm.auth.ctl.UserController;
 import com.ideacompany.etm.auth.dto.CommonResponse;
 import com.ideacompany.etm.auth.dto.LoginDto;
 import com.ideacompany.etm.auth.dto.LoginFormDto;

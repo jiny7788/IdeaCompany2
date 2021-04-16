@@ -26,7 +26,8 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://etm-infra-eureka-lb:8761/eureka
-      
+  instance:
+    preferIpAddress: true
           
 etm:
   accesskey:

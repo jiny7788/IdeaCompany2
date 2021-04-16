@@ -1,4 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.ideacompany.etm.auth.map.UserMapper">
 
 	<select id="loginUser" parameterType="com.ideacompany.etm.auth.dto.LoginFormDto" resultType="com.ideacompany.etm.auth.dto.LoginDto">
