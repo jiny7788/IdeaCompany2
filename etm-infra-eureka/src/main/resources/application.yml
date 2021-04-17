@@ -12,7 +12,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://etm-infra-eureka-lb:8761/eureka
+      defaultZone: http://etm-infra-eureka:8761/eureka
     register-with-eureka: false
     fetch-registry: false
   instance:

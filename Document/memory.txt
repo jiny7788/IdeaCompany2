@@ -4,17 +4,29 @@
 127.0.0.1 etm-infra-eureka-lb
 
 #docker image 빌드
-  docker build . -f Dockerfile -t etm-auth-control
+  docker build . -f Dockerfile -t etm-auth-control:202104172
+  docker build . -f Dockerfile -t etm-infra-eureka:202104172
+  docker build . -f Dockerfile -t etm-infra-gateway:202104172
+  docker build . -f Dockerfile -t etm-svc-control:202104172
   
-docker build . -f Dockerfile_eureka -t registry.secuiot/etm-infra-eureka:202104151
-docker build . -f Dockerfile_gateway -t registry.secuiot/etm-infra-gateway:202104151
-docker build . -f Dockerfile_svc -t registry.secuiot/etm-svc-control:202104151
-docker build . -f Dockerfile_auth -t registry.secuiot/etm-auth-control:202104151
+# docker 실행 - host 네트워크에서 실행되도록 함(host의 address를 공유하고 port만 구분됨)
+  docker network create ideacompany-net
 
-docker push registry.secuiot/etm-infra-eureka:202104151
-docker push registry.secuiot/etm-infra-gateway:202104151
-docker push registry.secuiot/etm-svc-control:202104151
-docker push registry.secuiot/etm-auth-control:202104151
+  docker run -d --name etm-infra-eureka -p 8761:8761 --network ideacompany-net etm-infra-eureka:202104172
+  docker run -d --name etm-auth-control -p 8091:8091 --network ideacompany-net --link pgsql:dbpostgre etm-auth-control:202104172
+  docker run -d --name etm-svc-control -p 8090:8090 --network ideacompany-net --link pgsql:dbpostgre etm-svc-control:202104172
+  docker run -d --name etm-infra-gateway -p 8080:8080 --network ideacompany-net etm-infra-gateway:202104172
+  
+#docker image 빌드 - docker registry에 등록 시...  
+  docker build . -f Dockerfile_eureka -t registry.secuiot/etm-infra-eureka:202104151
+  docker build . -f Dockerfile_gateway -t registry.secuiot/etm-infra-gateway:202104151
+  docker build . -f Dockerfile_svc -t registry.secuiot/etm-svc-control:202104151
+  docker build . -f Dockerfile_auth -t registry.secuiot/etm-auth-control:202104151
+  
+  docker push registry.secuiot/etm-infra-eureka:202104151
+  docker push registry.secuiot/etm-infra-gateway:202104151
+  docker push registry.secuiot/etm-svc-control:202104151
+  docker push registry.secuiot/etm-auth-control:202104151
 
 # docker image 저장하는 방법
   docker image pull [쿠버네티스에서 가져올 배포된 이미지 명]

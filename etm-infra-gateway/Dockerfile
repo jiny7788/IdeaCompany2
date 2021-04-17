@@ -1,4 +1,4 @@
-FROM registry.secuiot/base_java:8u151
+FROM stakater/oracle-jdk:8u152-alpine-3.7
 
 ADD /target/etm-infra-gateway*.jar /etm-infra-gateway
 

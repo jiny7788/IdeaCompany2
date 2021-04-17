@@ -1,0 +1,64 @@
+- Postgresql docker 설정 관련 : https://judo0179.tistory.com/48
+
+	1. docker pull postgres
+
+	2. docker volume create pgdata
+	   docker run -d -p 5432:5432 --name pgsql -e POSTGRES_PASSWORD=a12345! -it --rm -v pgdata:/var/lib/postgresql/data postgres
+	   
+	3. database / schema / user 생성 & 권한 부여
+		CREATE DATABASE mytestdb;
+		CREATE USER mytest PASSWORD 'a12345!';
+		GRANT ALL PRIVILEGES ON DATABASE mytestdb TO mytest;
+	
+	
+- Oracle 11g docker 설정
+
+    	1. docker pull jaspeen/oracle-11g
+	
+	2. docker run -d --privileged --name oracle11g -p 1521:1521 -v C:\Docker\oracle11g\install:/install -v dpdump:/opt/oracle/dpdump jaspeen/oracle-11g
+	
+	3. tablespace / user 생성 & 권한 부여
+	   create tablespace mytestd
+	   datafile '/opt/oracle/app/oradata/orcl/mytestdb01.dbf' size 200M;
+	   
+	   CREATE USER mytest
+	   IDENTIFIED BY a12345
+	   DEFAULT TABLESPACE mytestd
+	   QUOTA UNLIMITED ON mytestd; 
+	   
+	   grant connect, dba, resource to mytest;
+	   
+
+
+- StreamSets 설정
+
+	1. docker pull streamsets/datacollector
+	  
+	2. docker run --restart on-failure -p 18630:18630 -d --name sdc streamsets/datacollector
+	    http://localhost:18630  admin / admin
+
+- gitlab 설정 : https://lovemewithoutall.github.io/it/start-docker/
+
+	1. docker pull gitlab/gitlab-ce:latest
+
+	2. docker run --detach --hostname localhost --publish 443:443 --publish 80:80 --publish 22:22 --name gitlab -v gitconfig:/etc/gitlab -v gitlogs:/var/log/gitlab -v gitdata:/var/opt/gitlab gitlab/gitlab-ce:latest
+                  계정정보 :  root / apfhd98!       
+				  
+- redmine 설정 : https://wiserloner.tistory.com/162
+              : https://jistol.github.io/its/2018/01/25/redmine-mysql-in-docker/
+    1. docker-compose -f redminemysql.yml up
+       	계정정보 :  admin / apfhd98!     
+		
+		
+- Redis 설정
+  
+  1. docker network create redis-net
+
+  2. docker run --name dingrr -p 6379:6379 --network redis-net -d redis redis-server --appendonly yes
+  
+  3. docker run -it --network redis-net --rm redis redis-cli -h dingrr
+     select 1      # 1번 데이터 베이스 선택
+	 select 0      # 0번 데이터 베이스 선택
+     keys *        # 모든 키 보여줘!
+     keys *index*  # index가 포함된 키 보여줘!
+     del abce      # abcd 키 지워줘!

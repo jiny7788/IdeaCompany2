@@ -13,7 +13,7 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://etm-infra-eureka-lb:8761/eureka
+      defaultZone: http://etm-infra-eureka:8761/eureka
   instance:
     preferIpAddress: true
       
