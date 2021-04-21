@@ -1,0 +1,39 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.org/websocket-services: "etm-svc-websocket-cs"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-body-size: "80m"
+    nginx.ingress.kubernetes.io/configuration-snippet:
+      server_tokens off;
+  name: dsp-ingress
+spec:
+  tls:
+    - hosts:
+      - www.ideacompany.com
+      - api.ideacompany.com
+      secretName: w-ideacompany.com
+  rules:
+  - host: www.ideacompany.com
+    http:
+      paths:
+      - backend:
+          serviceName: etm-ui-control-cs
+          servicePort: 8080
+        path: /
+  - host: api.ideacompany.com
+    http:
+      paths:
+      - backend:
+          serviceName: etm-svc-websocket-cs
+          servicePort: 8081
+        path: /websocket
+      - backend:
+          serviceName: etm-infra-gateway-cs
+          servicePort: 8080
+        path: /

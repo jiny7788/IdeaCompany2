@@ -4,11 +4,11 @@
 	<include resource="org/springframework/boot/logging/logback/console-appender.xml" />
 
 	<springProfile name="default">
-		<property scope="context" name="SERVICE_LOG_HOME" value="/secuiot_logs/service" />
+		<property scope="context" name="SERVICE_LOG_HOME" value="/etm_logs/service" />
 	</springProfile>
 
 	<springProfile name="loc">
-		<property scope="context" name="SERVICE_LOG_HOME" value="C:/secuiot_logs/service" />
+		<property scope="context" name="SERVICE_LOG_HOME" value="C:/etm_logs/service" />
 	</springProfile>
 
 	<!-- SERVICE_LOG file -->
