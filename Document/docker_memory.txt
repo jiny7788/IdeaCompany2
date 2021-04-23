@@ -6,9 +6,15 @@
 	   docker run -d -p 5432:5432 --name pgsql -e POSTGRES_PASSWORD=a12345! -it --rm -v pgdata:/var/lib/postgresql/data postgres
 	   
 	3. database / schema / user 생성 & 권한 부여
-		CREATE DATABASE mytestdb;
 		CREATE USER mytest PASSWORD 'a12345!';
+	
+		CREATE TABLESPACE ts_mytest OWNER mytest location '/var/lib/postgresql/data/ts_mytest';
+
+		CREATE DATABASE mytestdb;
 		GRANT ALL PRIVILEGES ON DATABASE mytestdb TO mytest;
+		
+		=== mytest 계정으로 접속 후 스키마 생성 
+		CREATE SCHEMA mytest AUTHORIZATION mytest;
 	
 	
 - Oracle 11g docker 설정
