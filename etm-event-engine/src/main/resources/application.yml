@@ -1,0 +1,31 @@
+info:
+  app:
+    name: ^project.artifactId^
+    description: ^project.description^
+    version: ^project.version^
+    
+server:
+  port: 8092
+
+spring:
+  application:
+    name: ^project.artifactId^
+  db:
+    hikari:
+      driver-class-name: org.postgresql.Driver
+      jdbc-url: jdbc:postgresql://dbpostgre:5432/mytestdb
+      username: mytest
+      password: a12345!
+      minimumIdle: 30
+      maximumPoolSize: 30
+      connectionTestQuery: select 1
+
+kafka:
+  bootstrapAddress: kafka-svc:9093
+  autoCommit: false
+  offset:
+     reset: latest
+  groupId: event-engine
+  comsume:
+    topic: raw-event
+  

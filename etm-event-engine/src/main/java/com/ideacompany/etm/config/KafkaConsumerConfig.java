@@ -1,0 +1,80 @@
+package com.ideacompany.etm.config;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.ContainerProperties.AckMode;
+import org.springframework.kafka.listener.ErrorHandler;
+import org.springframework.kafka.listener.MessageListenerContainer;
+
+import com.ideacompany.etm.dto.BaseEvent;
+import com.ideacompany.etm.dto.BaseEventDeserializer;
+
+@EnableKafka
+@Configuration
+@ConfigurationProperties(prefix = "kafka")
+public class KafkaConsumerConfig {
+
+	Logger logger = LoggerFactory.getLogger(getClass());
+	
+	@Value(value = "${kafka.bootstrapAddress}")
+	private String bootstrapAddress;
+
+	@Value(value = "${kafka.groupId}")
+	private String groupId;
+	
+	@Value(value = "${kafka.offset.reset:latest}")
+	private String offsetReset;
+
+	public ConsumerFactory<String, BaseEvent> baseEventConsumerFactory() {
+		Map<String, Object> props = new HashMap<>();
+		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
+		props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+		// auto-commit disable 10/15
+		props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+		props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, offsetReset);
+		props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000");
+		return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new BaseEventDeserializer());
+	}
+
+	@Bean
+	public ConcurrentKafkaListenerContainerFactory<String, BaseEvent> baseEventKafkaListenerContainerFactory() {
+		ConcurrentKafkaListenerContainerFactory<String, BaseEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
+		factory.setConsumerFactory(baseEventConsumerFactory());
+		factory.setConcurrency(1); // :: todo (default: 1)
+		// listener will save offset to zookeeper 10/15
+		factory.getContainerProperties().setAckMode(AckMode.MANUAL);
+
+		// 테넌트 이벤트만 필터
+//		factory.setRecordFilterStrategy(r -> !(r.value().getTenantId().equals(Long.parseLong(tenant))));
+		
+		factory.setErrorHandler(new ErrorHandler() {
+			@Override
+			public void handle(Exception e, List<ConsumerRecord<?, ?>> records, Consumer<?, ?> consumer,
+				MessageListenerContainer container) {
+				logger.error("factory.setErrorHandler", e.toString());
+			}
+			@Override
+			public void handle(Exception thrownException, ConsumerRecord<?, ?> data) {
+				logger.error("factory.setErrorHandler.handle - timestamp:{}, partition:{}, offset:{}, {}",data.timestamp(), data.partition(),data.offset());
+			}
+		});
+		return factory;
+	}
+	
+}

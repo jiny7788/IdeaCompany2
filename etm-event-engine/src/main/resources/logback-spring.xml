@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<property name="CONSOLE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level --- [%15.15t] %logger:%line : %method - %m%n" />
+	<include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+
+	<springProfile name="default">
+		<property scope="context" name="SERVICE_LOG_HOME" value="/etm_logs/service" />
+	</springProfile>
+
+	<springProfile name="loc">
+		<property scope="context" name="SERVICE_LOG_HOME" value="C:/etm_logs/service" />
+	</springProfile>
+
+	<!-- SERVICE_LOG file -->
+	<appender name="FILE-SERVICE-LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level --- [%15.15t] %-40.40logger{39}:%line : %method - %m%n</Pattern>
+		</encoder>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<!-- rollover daily -->
+			<fileNamePattern>${SERVICE_LOG_HOME}/${HOSTNAME}_%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+			<maxFileSize>2GB</maxFileSize>
+			<maxHistory>90</maxHistory>
+			<!-- <totalSizeCap>100GB</totalSizeCap> -->
+		</rollingPolicy>
+	</appender>
+
+	<springProfile name="default">
+		<logger name="com.ideacompany.etm" level="info" additivity="false">
+			<appender-ref ref="FILE-SERVICE-LOG" />
+		</logger>
+		<root level="info">
+			<appender-ref ref="FILE-SERVICE-LOG" />
+		</root>
+	</springProfile>
+
+	<springProfile name="loc">
+		<logger name="com.ideacompany.etm" level="debug" additivity="false">
+			<appender-ref ref="CONSOLE" />
+		</logger>
+		<root level="info">
+			<appender-ref ref="CONSOLE" />
+		</root>
+	</springProfile>
+
+</configuration>
