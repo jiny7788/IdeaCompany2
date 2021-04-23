@@ -1,7 +1,8 @@
 # ideacompany hosts 설정
 127.0.0.1 db.internal.ideacompany.com
 127.0.0.1 redis-master-lb
-127.0.0.1 etm-infra-eureka-lb
+127.0.0.1 etm-infra-eureka-lb	# For K8s
+127.0.0.1 etm-infra-eureka		# For Docker
 
 #docker image 빌드
   docker build . -f Dockerfile -t etm-auth-control:202104172
@@ -36,17 +37,20 @@
   docker save -o registry.secuiot-develop-dsp-ui-control-20200205-1_e51bc3457b1659a43df76966290cc0581d0f78a0.tar registry.secuiot/develop/dsp-ui-control:20200205.1_e51bc3457b1659a43df76966290cc0581d0f78a0
 
 # docker image build 후 registry 서버에 push 하는 방법
-docker tag etm-infra-eureka:latest registry.secuiot/etm-infra-eureka:20210414.1
-docker push registry.secuiot/etm-infra-eureka:20210414.1
+  docker tag etm-infra-eureka:latest registry.secuiot/etm-infra-eureka:20210414.1
+  docker push registry.secuiot/etm-infra-eureka:20210414.1
 
 # docker registry에서 pull해서 실행하는 방법
-docker run registry.secuiot/etm-infra-eureka:20210414.1
+  docker run registry.secuiot/etm-infra-eureka:20210414.1
 
 # 이미지 확인하기
-curl -X GET http://registry.secuiot/v2/_catalog
+  curl -X GET http://registry.secuiot/v2/_catalog
 
 # 태그 정보 확인하기
-curl -X GET http://registry.secuiot/v2/etm-infra-eureka/tags/list
+  curl -X GET http://registry.secuiot/v2/etm-infra-eureka/tags/list
+
+#Kubernates secret 생성
+  kubectl create secret tls star-kwangsiklee-com --key star.kwangsiklee.com.key --cert star.kwangsiklee.com.crt
 
 # Redis 사용법
 	cd /usr/bin
