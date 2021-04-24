@@ -27,7 +27,7 @@ spring:
 etm:
   redis:
     login-token:
-      host: redis-master-lb
+      host: dingrr
       port: 6379
       database: 10
       

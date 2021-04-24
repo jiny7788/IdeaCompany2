@@ -51,7 +51,7 @@ public class DBConfig {
         return sqlSessionFactoryBean.getObject();
     }
 
-    @Bean(name = "db1SqlSessionTemplate")
+    @Bean(name = "dbSqlSessionTemplate")
     public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory dbSqlSessionFactory) throws Exception {
         return new SqlSessionTemplate(dbSqlSessionFactory);
     }

@@ -13,7 +13,7 @@ spring:
   db:
     hikari:
       driver-class-name: org.postgresql.Driver
-      jdbc-url: jdbc:postgresql://dbpostgre:5432/mytestdb
+      jdbc-url: jdbc:postgresql://pgsql:5432/mytestdb
       username: mytest
       password: a12345!
       minimumIdle: 30

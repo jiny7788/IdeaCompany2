@@ -58,11 +58,11 @@
 		
 - Redis 설정
   
-  1. docker network create redis-net
+  1. docker network create ideacompany-net
 
-  2. docker run --name dingrr -p 6379:6379 --network redis-net -d redis redis-server --appendonly yes
+  2. docker run --name dingrr -p 6379:6379 --network ideacompany-net -d redis redis-server --appendonly yes
   
-  3. docker run -it --network redis-net --rm redis redis-cli -h dingrr
+  3. docker run -it --network ideacompany-net --rm redis redis-cli -h dingrr
      select 1      # 1번 데이터 베이스 선택
 	 select 0      # 0번 데이터 베이스 선택
      keys *        # 모든 키 보여줘!
