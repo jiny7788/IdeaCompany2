@@ -1,5 +1,7 @@
 package com.ideacompany.etm.dto;
 
+import java.util.Map;
+
 import org.apache.kafka.common.serialization.Deserializer;
 
 import com.google.gson.Gson;
@@ -25,6 +27,18 @@ public class BaseEventDeserializer implements Deserializer<BaseEvent> {
 		}
 		return o;
 
+	}
+
+	@Override
+	public void configure(Map<String, ?> configs, boolean isKey) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void close() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -19,7 +19,7 @@
 
 		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
 			<!-- rollover daily -->
-			<fileNamePattern>${SERVICE_LOG_HOME}/${HOSTNAME}_%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+			<fileNamePattern>${SERVICE_LOG_HOME}/${serverName:-${HOSTNAME}}_%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
 			<maxFileSize>2GB</maxFileSize>
 			<maxHistory>90</maxHistory>
 			<!-- <totalSizeCap>100GB</totalSizeCap> -->

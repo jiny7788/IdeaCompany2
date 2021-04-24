@@ -21,11 +21,17 @@ spring:
       connectionTestQuery: select 1
 
 kafka:
-  bootstrapAddress: kafka-svc:9093
+  bootstrapAddress: kafka-svc:9092
   autoCommit: false
   offset:
      reset: latest
   groupId: event-engine
   comsume:
-    topic: raw-event
+    topic: base-event
+  produce:
+    topic: alarm-event
   
+zk:
+  conn: zk-svc:2181
+  sessionTimeoutMs: 3000
+  offsets: /etm/offsets/event-engine

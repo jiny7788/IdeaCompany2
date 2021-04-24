@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-	<property name="CONSOLE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{X-B3-TraceId:-},%X{X-B3-SpanId:-},%X{X-B3-ParentSpanId:-},%X{X-Span-Export:-}] ${PID:-} --- [%15.15t] %logger:%line : %method - %m%n" />
+	<property name="CONSOLE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level --- [%15.15t] %logger:%line : %method - %m%n" />
 	<include resource="org/springframework/boot/logging/logback/console-appender.xml" />
 
 	<springProfile name="default">
@@ -14,12 +14,12 @@
 	<!-- SERVICE_LOG file -->
 	<appender name="FILE-SERVICE-LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{X-B3-TraceId:-},%X{X-B3-SpanId:-},%X{X-B3-ParentSpanId:-},%X{X-Span-Export:-}] --- [%15.15t] %-40.40logger{39}:%line : %method - %m%n</Pattern>
+			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level --- [%15.15t] %-40.40logger{39}:%line : %method - %m%n</Pattern>
 		</encoder>
 
 		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
 			<!-- rollover daily -->
-			<fileNamePattern>${SERVICE_LOG_HOME}/${HOSTNAME}_%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+			<fileNamePattern>${SERVICE_LOG_HOME}/${serverName:-${HOSTNAME}}_%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
 			<maxFileSize>2GB</maxFileSize>
 			<maxHistory>90</maxHistory>
 			<!-- <totalSizeCap>100GB</totalSizeCap> -->

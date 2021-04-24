@@ -3,7 +3,7 @@
 	1. docker pull postgres
 
 	2. docker volume create pgdata
-	   docker run -d -p 5432:5432 --name pgsql -e POSTGRES_PASSWORD=a12345! -it --rm -v pgdata:/var/lib/postgresql/data postgres
+	   docker run -d -p 5432:5432 --name pgsql -e POSTGRES_PASSWORD=a12345! -it --rm -v pgdata:/var/lib/postgresql/data --network ideacompany-net  postgres
 	   
 	3. database / schema / user 생성 & 권한 부여
 		CREATE USER mytest PASSWORD 'a12345!';

@@ -1,10 +1,10 @@
 # ideacompany hosts 설정
 127.0.0.1 db.internal.ideacompany.com	#for K8s
-127.0.0.1 pgsql							#for Docker
+127.0.0.1 pgsql							#for Docker, local
 127.0.0.1 redis-master-lb				#for K8s
-127.0.0.1 dingrr						#for Docker
+127.0.0.1 dingrr						#for Docker, local
 127.0.0.1 etm-infra-eureka-lb			#for K82
-127.0.0.1 etm-infra-eureka				#for Docker
+127.0.0.1 etm-infra-eureka				#for Docker, local
 
 #docker image 빌드
   docker build . -f Dockerfile -t etm-auth-control:202104241

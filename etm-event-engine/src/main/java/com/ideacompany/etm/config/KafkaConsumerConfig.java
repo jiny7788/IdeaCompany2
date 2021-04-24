@@ -45,7 +45,6 @@ public class KafkaConsumerConfig {
 		Map<String, Object> props = new HashMap<>();
 		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
 		props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-		// auto-commit disable 10/15
 		props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
 		props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, offsetReset);
 		props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000");
@@ -57,12 +56,7 @@ public class KafkaConsumerConfig {
 		ConcurrentKafkaListenerContainerFactory<String, BaseEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(baseEventConsumerFactory());
 		factory.setConcurrency(1); // :: todo (default: 1)
-		// listener will save offset to zookeeper 10/15
 		factory.getContainerProperties().setAckMode(AckMode.MANUAL);
-
-		// 테넌트 이벤트만 필터
-//		factory.setRecordFilterStrategy(r -> !(r.value().getTenantId().equals(Long.parseLong(tenant))));
-		
 		factory.setErrorHandler(new ErrorHandler() {
 			@Override
 			public void handle(Exception e, List<ConsumerRecord<?, ?>> records, Consumer<?, ?> consumer,
