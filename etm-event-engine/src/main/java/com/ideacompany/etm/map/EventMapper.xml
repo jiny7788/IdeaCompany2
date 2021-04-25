@@ -3,5 +3,25 @@
 
 <mapper namespace="com.ideacompany.etm.map.EventMapper">
 
+	<insert id="insertRawEvent" parameterType="com.ideacompany.etm.dto.BaseEvent">
+		INSERT INTO mytest.tb_raw_event
+		(
+			eventId, eventStartTime, eventEndTime, eventCategory, eventName, 
+			eventCount, eventRiskLevel, rawEvent, rawEventLength, applicationProtocol,
+			collectorAddress, collectorType, collectorTimeZone, collectorReceiptTime, collectorVersion,
+			collectorId, deviceId, deviceAddress, deviceHostName, deviceProduct,
+			deviceReceiptTime, deviceTimeZone, deviceVendor, deviceVersion,	deviceSerial, 
+			hrEmployeeNumber, hrDepartment,	hrEmployeeName
+		)
+		VALUES
+		(
+			#{eventId}, TO_TIMESTAMP(#{eventStartTime}::INT8/1000), TO_TIMESTAMP(#{eventEndTime}::INT8/1000), #{eventCategory}, #{eventName},
+			#{eventCount}, #{eventRiskLevel}, #{rawEvent}, #{rawEventLength}, #{applicationProtocol},
+			#{collectorAddress}, #{collectorType}, #{collectorTimeZone}, TO_TIMESTAMP(#{collectorReceiptTime}::INT8/1000), #{collectorVersion},
+			#{collectorId}, #{deviceId}, #{deviceAddress}, #{deviceHostName}, #{deviceProduct},
+			TO_TIMESTAMP(#{deviceReceiptTime}::INT8/1000), #{deviceTimeZone}, #{deviceVendor}, #{deviceVersion}, #{deviceSerial},
+			#{hrEmployeeNumber}, #{hrDepartment}, #{hrEmployeeName}
+		)
+	</insert>
 	
 </mapper>

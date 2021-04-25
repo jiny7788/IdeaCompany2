@@ -35,19 +35,30 @@ public class KafkaConsumerConfig {
 	@Value(value = "${kafka.bootstrapAddress}")
 	private String bootstrapAddress;
 
-	@Value(value = "${kafka.groupId}")
+	@Value(value = "${kafka.consumer.group-id:event-engine}")
 	private String groupId;
 	
-	@Value(value = "${kafka.offset.reset:latest}")
+	@Value(value = "${kafka.consumer.auto_offset_reset:latest}")
 	private String offsetReset;
+	
+	@Value(value = "${kafka.consumer.enable-auto-commit}")
+    private String ebableAutoCommit;
+	
+	@Value(value = "${kafka.consumer.auto-commit-interval}")
+    private String autoCommitInterval;
+	
+	@Value(value = "${kafka.consumer.max-poll-records}")
+    private String maxPollRecords;	
 
 	public ConsumerFactory<String, BaseEvent> baseEventConsumerFactory() {
 		Map<String, Object> props = new HashMap<>();
 		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
 		props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-		props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
 		props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, offsetReset);
+		props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, ebableAutoCommit);
+		props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, autoCommitInterval);
 		props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000");
+		props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPollRecords);
 		return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new BaseEventDeserializer());
 	}
 
@@ -55,19 +66,10 @@ public class KafkaConsumerConfig {
 	public ConcurrentKafkaListenerContainerFactory<String, BaseEvent> baseEventKafkaListenerContainerFactory() {
 		ConcurrentKafkaListenerContainerFactory<String, BaseEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(baseEventConsumerFactory());
-		factory.setConcurrency(1); // :: todo (default: 1)
-		factory.getContainerProperties().setAckMode(AckMode.MANUAL);
-		factory.setErrorHandler(new ErrorHandler() {
-			@Override
-			public void handle(Exception e, List<ConsumerRecord<?, ?>> records, Consumer<?, ?> consumer,
-				MessageListenerContainer container) {
-				logger.error("factory.setErrorHandler", e.toString());
-			}
-			@Override
-			public void handle(Exception thrownException, ConsumerRecord<?, ?> data) {
-				logger.error("factory.setErrorHandler.handle - timestamp:{}, partition:{}, offset:{}, {}",data.timestamp(), data.partition(),data.offset());
-			}
-		});
+		
+		// 특정 Event만 필터링하고 싶은 경우 여기서 처리
+		// factory.setRecordFilterStrategy(r -> (r.value().getEventCategory() == xxxx) );
+
 		return factory;
 	}
 	

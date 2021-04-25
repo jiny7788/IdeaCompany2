@@ -45,7 +45,7 @@ public class BaseEvent {
 	private String collectorId;
 	
 	@SerializedName(value="d01", alternate={"deviceId"})
-	private Long assetsId;
+	private String deviceId;
 	@SerializedName(value="d02", alternate={"deviceAddress"})
 	private String deviceAddress;
 	@SerializedName(value="d03", alternate={"deviceHostName"})
@@ -61,7 +61,7 @@ public class BaseEvent {
 	@SerializedName(value="d08", alternate={"deviceVersion"})
 	private String deviceVersion;
 	@SerializedName(value="d09", alternate={"deviceSerial"})
-	private Long deviceSerial;
+	private String deviceSerial;
 	
 	@SerializedName(value="h01", alternate={"hrEmployeeNumber"})
 	private String hrEmployeeNumber;
@@ -69,5 +69,5 @@ public class BaseEvent {
 	private String hrDepartment;
 	@SerializedName(value="h03", alternate={"hrEmployeeName"})
 	private String hrEmployeeName;
-	
+
 }

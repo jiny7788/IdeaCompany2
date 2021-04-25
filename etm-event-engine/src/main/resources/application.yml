@@ -22,13 +22,14 @@ spring:
 
 kafka:
   bootstrapAddress: kafka-svc:9092
-  autoCommit: false
-  offset:
-     reset: latest
-  groupId: event-engine
-  comsume:
+  consumer:
+    group-id: event-engine
     topic: base-event
-  produce:
+    auto_offset_reset: latest
+    enable-auto-commit: true
+    auto-commit-interval: 1000
+    max-poll-records: 10
+  producer:
     topic: alarm-event
   
 zk:
