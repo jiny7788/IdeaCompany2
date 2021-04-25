@@ -49,5 +49,41 @@ create TABLE mytest.tb_raw_event (
 	hrDepartment varchar(100) NULL,
 	hrEmployeeName varchar(100) NULL,	
 	CONSTRAINT pk_tb_raw_event PRIMARY KEY (event_seq)
-)
-;
+);
+
+create TABLE mytest.tb_alarm_event (
+	alarmId bigserial NOT NULL,	
+	alarmRuleId INT8 NULL,
+	alarmRuleName varchar(100) NULL,
+	alarmTime timestamptz NULL,	
+	event_seq INT8 NOT NULL,
+	eventId varchar(100) NOT NULL, 
+	eventStartTime timestamptz NULL,
+	eventEndTime timestamptz NULL,
+	eventCategory varchar(100) NULL,
+	eventName varchar(100) NULL,
+	eventCount INT8 NULL, 
+	eventRiskLevel INT8 NULL, 
+	rawEvent varchar(4000) NULL,
+	rawEventLength INT8 NULL, 
+	applicationProtocol varchar(100) NULL,
+	collectorAddress varchar(100) NULL,
+	collectorType varchar(100) NULL,
+	collectorTimeZone varchar(100) NULL,
+	collectorReceiptTime timestamptz NULL,
+	collectorVersion varchar(100) NULL,
+	collectorId varchar(100) NULL,
+	deviceId varchar(100) NULL,
+	deviceAddress varchar(100) NULL,
+	deviceHostName varchar(100) NULL,
+	deviceProduct varchar(100) NULL,
+	deviceReceiptTime timestamptz NULL,
+	deviceTimeZone varchar(100) NULL,
+	deviceVendor varchar(100) NULL,
+	deviceVersion varchar(100) NULL,
+	deviceSerial varchar(100) NULL,
+	hrEmployeeNumber varchar(100) NULL,
+	hrDepartment varchar(100) NULL,
+	hrEmployeeName varchar(100) NULL,	
+	CONSTRAINT pk_tb_alarm_event PRIMARY KEY (alarmId)
+);

@@ -4,8 +4,12 @@
 <mapper namespace="com.ideacompany.etm.map.EventMapper">
 
 	<insert id="insertRawEvent" parameterType="com.ideacompany.etm.dto.BaseEvent">
+	    <selectKey resultType="long" keyProperty="eventSeq" order="BEFORE">
+    		select nextval('mytest.tb_raw_event_event_seq_seq')
+		</selectKey>
 		INSERT INTO mytest.tb_raw_event
 		(
+			event_seq,
 			eventId, eventStartTime, eventEndTime, eventCategory, eventName, 
 			eventCount, eventRiskLevel, rawEvent, rawEventLength, applicationProtocol,
 			collectorAddress, collectorType, collectorTimeZone, collectorReceiptTime, collectorVersion,
@@ -15,6 +19,37 @@
 		)
 		VALUES
 		(
+			#{eventSeq},
+			#{eventId}, TO_TIMESTAMP(#{eventStartTime}::INT8/1000), TO_TIMESTAMP(#{eventEndTime}::INT8/1000), #{eventCategory}, #{eventName},
+			#{eventCount}, #{eventRiskLevel}, #{rawEvent}, #{rawEventLength}, #{applicationProtocol},
+			#{collectorAddress}, #{collectorType}, #{collectorTimeZone}, TO_TIMESTAMP(#{collectorReceiptTime}::INT8/1000), #{collectorVersion},
+			#{collectorId}, #{deviceId}, #{deviceAddress}, #{deviceHostName}, #{deviceProduct},
+			TO_TIMESTAMP(#{deviceReceiptTime}::INT8/1000), #{deviceTimeZone}, #{deviceVendor}, #{deviceVersion}, #{deviceSerial},
+			#{hrEmployeeNumber}, #{hrDepartment}, #{hrEmployeeName}
+		)
+	</insert>
+
+	<insert id="insertAlarm" parameterType="com.ideacompany.etm.dto.AlarmEvent">
+		<selectKey resultType="long" keyProperty="alarmId" order="BEFORE">
+    		select nextval('mytest.tb_alarm_event_alarmid_seq')
+		</selectKey>		
+		INSERT INTO mytest.tb_alarm_event
+		(
+			alarmId,
+			alarmRuleId, alarmRuleName, alarmTime,	
+			event_seq,
+			eventId, eventStartTime, eventEndTime, eventCategory, eventName, 
+			eventCount, eventRiskLevel, rawEvent, rawEventLength, applicationProtocol,
+			collectorAddress, collectorType, collectorTimeZone, collectorReceiptTime, collectorVersion,
+			collectorId, deviceId, deviceAddress, deviceHostName, deviceProduct,
+			deviceReceiptTime, deviceTimeZone, deviceVendor, deviceVersion,	deviceSerial, 
+			hrEmployeeNumber, hrDepartment,	hrEmployeeName
+		)
+		VALUES
+		(
+			#{alarmId},
+			#{alarmRuleId}, #{alarmRuleName}, TO_TIMESTAMP(#{alarmTime}::INT8/1000),
+			#{eventSeq},
 			#{eventId}, TO_TIMESTAMP(#{eventStartTime}::INT8/1000), TO_TIMESTAMP(#{eventEndTime}::INT8/1000), #{eventCategory}, #{eventName},
 			#{eventCount}, #{eventRiskLevel}, #{rawEvent}, #{rawEventLength}, #{applicationProtocol},
 			#{collectorAddress}, #{collectorType}, #{collectorTimeZone}, TO_TIMESTAMP(#{collectorReceiptTime}::INT8/1000), #{collectorVersion},

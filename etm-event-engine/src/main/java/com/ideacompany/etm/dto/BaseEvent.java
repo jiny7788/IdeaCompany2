@@ -70,4 +70,5 @@ public class BaseEvent {
 	@SerializedName(value="h03", alternate={"hrEmployeeName"})
 	private String hrEmployeeName;
 
+	private Long eventSeq;	// DB에서 생성되는 sequence 값
 }
