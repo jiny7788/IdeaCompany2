@@ -1,0 +1,16 @@
+info:
+  app:
+    name: ^project.artifactId^
+    description: ^project.description^
+    version: ^project.version^
+    
+server:
+  port: 8093
+
+spring:
+  application:
+    name: ^project.artifactId^
+
+etm:
+  websocket:
+    api-key: 52f16570-a657-11eb-bcbc-0242ac130002

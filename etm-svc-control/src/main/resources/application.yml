@@ -19,4 +19,13 @@ eureka:
       defaultZone: http://etm-infra-eureka:8761/eureka
   instance:
     preferIpAddress: true
+
+websocket:
+  enable: true
+  host: etm-svc-websocket
+  port: 8093
+  end-points: /ws
+  brokers:  /topic
+  destination-prefixes: /app
+  api-key: 52f16570-a657-11eb-bcbc-0242ac130002
       

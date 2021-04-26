@@ -17,7 +17,7 @@ spec:
     - hosts:
       - www.ideacompany.com
       - api.ideacompany.com
-      secretName: w-ideacompany.com
+      secretName: w-ideacompany-com
   rules:
   - host: www.ideacompany.com
     http:

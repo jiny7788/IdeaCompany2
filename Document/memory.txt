@@ -5,6 +5,8 @@
 127.0.0.1 dingrr						#for Docker, local
 127.0.0.1 etm-infra-eureka-lb			#for K82
 127.0.0.1 etm-infra-eureka				#for Docker, local
+127.0.0.1 kafka-svc
+127.0.0.1 etm-svc-websocket
 
 #docker image 빌드
   docker build . -f Dockerfile -t etm-auth-control:202104241

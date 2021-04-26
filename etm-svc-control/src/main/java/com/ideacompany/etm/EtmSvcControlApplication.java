@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ideacompany.etm.config.WebSocketConfig;
+import com.ideacompany.etm.dto.RealTimeAlarmsDto;
+import com.ideacompany.etm.svc.WebSocketService;
+
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
@@ -32,6 +36,12 @@ public class EtmSvcControlApplication {
 @RequestMapping(path = "/test/")
 class GreetingController {
 	private static final Logger logger = LoggerFactory.getLogger(GreetingController.class);
+	
+	@Autowired
+	WebSocketService webSocketService;
+	
+	@Autowired
+	WebSocketConfig webSocketConfig;
 
 	@RequestMapping("/")
 	Greet greet() {
@@ -45,6 +55,16 @@ class GreetingController {
 	public HttpEntity<Greet> greeting(
 			@RequestParam(value = "name", required = false, defaultValue = "HATEOAS") String name) {
 		Greet greet = new Greet("Hello " + name);
+		
+		try {
+			RealTimeAlarmsDto item = new RealTimeAlarmsDto();
+			
+			item.setHrEmployeeName(name);
+			
+			webSocketService.sendRealtimeAlarm(webSocketConfig.getHost(), webSocketConfig.getPort(), item, 1);
+		} catch (Exception e) {
+			logger.info(e.getMessage());
+		}
 		
 		return new ResponseEntity<Greet>(greet, HttpStatus.OK);
 	}
