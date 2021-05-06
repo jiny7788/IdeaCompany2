@@ -28,4 +28,9 @@ websocket:
   brokers:  /topic
   destination-prefixes: /app
   api-key: 52f16570-a657-11eb-bcbc-0242ac130002
-      
+
+etm:
+  redis:
+    host: dingrr
+    port: 6379
+    database: 10  
