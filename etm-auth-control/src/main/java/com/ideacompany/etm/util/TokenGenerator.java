@@ -61,7 +61,7 @@ public class TokenGenerator {
 
         today.add(Calendar.MINUTE, setExpireDate);
 
-        String payLoad = "{\"iss\":\"secudiumiot.com\",\"exp\":\"" + sdf.format(new Date(today.getTimeInMillis())) + "\",\"user_no\":\""
+        String payLoad = "{\"iss\":\"ideacompany.com\",\"exp\":\"" + sdf.format(new Date(today.getTimeInMillis())) + "\",\"user_no\":\""
                 + Long.toString(user_no) + "\"}";
 
         AES256Util encoder = new AES256Util(encryptionKey);
