@@ -30,7 +30,7 @@ import okhttp3.Response;
 import okhttp3.internal.http.HttpMethod;
 
 @CrossOrigin
-@Component
+//@Component
 public class RouteFilter extends ZuulFilter {
 	private static Logger logger = LoggerFactory.getLogger(RouteFilter.class);
 	
