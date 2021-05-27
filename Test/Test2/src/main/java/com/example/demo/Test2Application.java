@@ -97,7 +97,7 @@ class GreetingController {
 //		logger.info(request.getSession().getId());
 		
 		AlarmSearchVO vo = new AlarmSearchVO();
-		vo.setAlarmSeq("123");
+		vo.setAlarmSeq("1211113");
 		
 		AlarmDetail result = service.sendTest(vo);
 		

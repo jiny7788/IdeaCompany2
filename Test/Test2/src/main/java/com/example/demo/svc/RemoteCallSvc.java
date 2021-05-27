@@ -11,11 +11,9 @@ import javax.crypto.spec.SecretKeySpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -107,10 +105,17 @@ public class RemoteCallSvc {
 //            AlarmDetail result = restTemplate.postForObject(url.toString(), requestEntity, AlarmDetail.class);
 //            logger.info("http response: [{}]", result.toString());
 
-            MultiValueMap param = new LinkedMultiValueMap<>();
-            param.add("alarmSeq", "12222");            
+//            MultiValueMap<String, String> param = new LinkedMultiValueMap<String, String>();
+//            param.add("alarmSeq", "12222");            
+//            ResponseEntity resultEntity = restTemplate.postForEntity(url.toString(), param, AlarmDetail.class);
+          
             
-            ResponseEntity resultEntity = restTemplate.postForEntity(url.toString(), param, AlarmDetail.class);
+//            HttpEntity<?> requestEntity = new HttpEntity<>(param, headers);
+//            ResponseEntity resultEntity = restTemplate.postForEntity(url.toString(), requestEntity, AlarmDetail.class);
+//            ResponseEntity resultEntity = restTemplate.exchange(url.toString(), HttpMethod.POST, requestEntity, AlarmDetail.class);
+            
+            HttpEntity<?> requestEntity = new HttpEntity<>(vo, headers);
+            ResponseEntity<AlarmDetail> resultEntity = restTemplate.exchange(url.toString(), HttpMethod.POST, requestEntity, AlarmDetail.class);          
             
             // return HttpStatus.OK.equals(resultEntity.getStatusCode());
             return (AlarmDetail) resultEntity.getBody();
