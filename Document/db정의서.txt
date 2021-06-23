@@ -87,3 +87,16 @@ create TABLE mytest.tb_alarm_event (
 	hrEmployeeName varchar(100) NULL,	
 	CONSTRAINT pk_tb_alarm_event PRIMARY KEY (alarmId)
 );
+
+CREATE TABLE mytest.tb_board (
+	board_no bigserial NOT NULL,
+	board_type varchar(50) NULL,
+	title varchar(50) NULL,
+	contents varchar(1000) NULL,
+	memberno int8 NULL,
+	createdtime timestamptz NULL,
+	updatedtime timestamptz NULL,
+	likes int8 NULL,
+	counts int8 NULL,
+	CONSTRAINT pk_tb_boar PRIMARY KEY (board_no)
+);
