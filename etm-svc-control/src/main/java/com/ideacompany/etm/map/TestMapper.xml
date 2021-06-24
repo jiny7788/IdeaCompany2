@@ -17,4 +17,63 @@
 		FROM mytest.tb_board
 	</select>
 	
+	<insert id="save" parameterType="com.ideacompany.etm.dto.Board">
+		INSERT into mytest.tb_board 
+			(board_type, title, contents, memberno, createdtime, likes, counts)
+			values
+			(#{type}, #{title}, #{contents}, #{memberNo}::BIGINT, now(), 0::BIGINT, 0::BIGINT)	
+	</insert>
+	
+	<select id="findById" parameterType="Integer" resultType="com.ideacompany.etm.dto.Board">
+		SELECT 
+			board_no as no,
+			board_type as type,
+			title,
+			contents,
+			memberno,
+			createdtime,
+			updatedtime,
+			likes,
+			counts
+		FROM mytest.tb_board
+		WHERE board_no = #{no}::BIGINT
+	</select>
+
+	<update id="update" parameterType="com.ideacompany.etm.dto.Board">
+		UPDATE mytest.tb_board set			
+			board_type = #{type},
+			title = #{title},
+			contents = #{contents},			
+			updatedtime = #{updatedTime}::timestamp
+		WHERE board_no = #{no}::BIGINT
+	</update>
+
+	<delete id="delete" parameterType="com.ideacompany.etm.dto.Board">
+		DELETE from  mytest.tb_board			
+		WHERE board_no = #{no}::BIGINT
+	</delete>
+	
+	<select id="count" resultType="Integer">
+		SELECT 
+			count(*)
+		FROM mytest.tb_board
+	</select>
+	
+	<select id="findFromTo" resultType="com.ideacompany.etm.dto.Board">
+		SELECT 
+			board_no as no,
+			board_type as type,
+			title,
+			contents,
+			memberno,
+			createdtime,
+			updatedtime,
+			likes,
+			counts
+		FROM mytest.tb_board
+		ORDER BY board_no DESC
+		OFFSET #{startNum} LIMIT #{countPerPage} 
+	</select>
+	
+	
 </mapper>
