@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import BoardService from "../service/BoardService";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 class CreateBoardComponent extends Component {
   constructor(props) {
@@ -28,8 +30,9 @@ class CreateBoardComponent extends Component {
     this.setState({ title: event.target.value });
   };
 
-  changeContentsHandler = (event) => {
-    this.setState({ contents: event.target.value });
+  changeContentsHandler = (event, editor) => {
+    const data = editor.getData();
+    this.setState({ contents: data });
   };
 
   changeMemberNoHandler = (event) => {
@@ -121,12 +124,17 @@ class CreateBoardComponent extends Component {
                   </div>
                   <div className="form-group">
                     <label> Contents </label>
-                    <textarea
-                      placeholder="contents"
-                      name="contents"
-                      className="form-control"
-                      value={this.state.contents}
+                    <CKEditor
+                      editor={ClassicEditor}
+                      data={this.state.contents}
+                      onReady={(editor) => {
+                        // You can store the "editor" and use when it is needed.
+                        console.log("Editor is ready to use!", editor);
+                      }}
                       onChange={this.changeContentsHandler}
+                      onFocus={(event, editor) => {
+                        console.log("Focus.", editor);
+                      }}
                     />
                   </div>
                   <div className="form-group">

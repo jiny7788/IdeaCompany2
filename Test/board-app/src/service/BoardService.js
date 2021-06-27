@@ -3,8 +3,8 @@ import axios from 'axios';
 const BOARD_API_BASE_URL = "http://localhost:8090/test/board";
 
 class BoardService {
-    getBoards() {
-        return axios.get(BOARD_API_BASE_URL);
+    getBoards(p_num) {
+        return axios.get(BOARD_API_BASE_URL + "?p_num="+ p_num);
     }
 
     createBoard(board) {

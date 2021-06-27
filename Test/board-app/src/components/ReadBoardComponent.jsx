@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import BoardService from "../service/BoardService";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 class ReadBoardComponent extends Component {
   constructor(props) {
@@ -84,8 +86,19 @@ class ReadBoardComponent extends Component {
             </div>
 
             <div className="row">
-              <label> Contents </label> : <br></br>
-              <textarea value={this.state.board.contents} readOnly />
+              <label> Contents </label> <br></br>
+              <CKEditor
+                editor={ClassicEditor}
+                data={this.state.board.contents}
+                onReady={(editor) => {
+                  // You can store the "editor" and use when it is needed.
+                  console.log("Editor is ready to use!", editor);
+                }}
+                onChange={this.changeContentsHandler}
+                onFocus={(event, editor) => {
+                  console.log("Focus.", editor);
+                }}
+              />
             </div>
 
             <div className="row">
