@@ -91,8 +91,7 @@ class ReadBoardComponent extends Component {
                 editor={ClassicEditor}
                 data={this.state.board.contents}
                 onReady={(editor) => {
-                  // You can store the "editor" and use when it is needed.
-                  console.log("Editor is ready to use!", editor);
+                  editor.isReadOnly = true;
                 }}
                 onChange={this.changeContentsHandler}
                 onFocus={(event, editor) => {
