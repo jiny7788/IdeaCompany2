@@ -43,7 +43,7 @@ class ListBoardComponent extends Component {
     });
   }
 
-  viewPaging() {
+  viewPaging(cur) {
     const pageNums = [];
 
     for (
@@ -51,7 +51,8 @@ class ListBoardComponent extends Component {
       i <= this.state.paging.pageNumEnd;
       i++
     ) {
-      pageNums.push(i);
+      if (i == cur) pageNums.push(`*${i}*`);
+      else pageNums.push(i);
     }
 
     return pageNums.map((page) => (
@@ -173,7 +174,7 @@ class ListBoardComponent extends Component {
             <ul className="pagination justify-content-center">
               {this.isMoveToFirstPage()}
               {this.isPagingPrev()}
-              {this.viewPaging()}
+              {this.viewPaging(this.state.p_num)}
               {this.isPagingNext()}
               {this.isMoveToLastPage()}
             </ul>
