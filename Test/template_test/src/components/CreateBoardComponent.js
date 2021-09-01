@@ -160,7 +160,7 @@ class CreateBoardComponent extends Component {
         </CCard>
       </CCol>  
     </CRow>
-  );
+    );
     }
 }
 

@@ -50,7 +50,6 @@ const ReadBoardComponent = ({ match }) => {
   };
 
   const goToList = () => {
-    //console.log(data);
     history.push(`/base/tables/${data.pageNo}`);
   };
 
