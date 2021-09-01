@@ -65,7 +65,6 @@ function MyCustomUploadAdapterPlugin(editor) {
 
 class MyUploadAdapter {
     constructor(props) {
-        // CKEditor 5's FileLoader instance.
       this.loader = props;
       // URL where to send files.
       this.url = `http://localhost:8090/test/fileUpload`;

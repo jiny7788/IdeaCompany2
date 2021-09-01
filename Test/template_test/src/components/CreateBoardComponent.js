@@ -67,17 +67,6 @@ class CreateBoardComponent extends Component {
     }));
   };
 
-  // changeContentsHandler = (event, editor) => {
-  //   const content = editor.getData();
-  //   this.setState(prev => ({
-  //       ...prev,
-  //       board: {
-  //         ...prev.board,
-  //         contents:content,
-  //       }
-  //     }));
-  // };
-
   changeContentsHandler = (data) => {
     console.log(data);
     this.setState(prev => ({

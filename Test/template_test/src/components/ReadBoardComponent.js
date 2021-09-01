@@ -64,7 +64,6 @@ const ReadBoardComponent = ({ match }) => {
       )
     ) {
       BoardService.deleteBoard(data.no).then((res) => {
-        //console.log("delete result => " + JSON.stringify(res));
         if (res.status == 200) {
           history.push(`/base/tables/${data.pageNo}`);
         } else {
