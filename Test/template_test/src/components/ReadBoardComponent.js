@@ -13,9 +13,6 @@ import {
   CRow,
 } from '@coreui/react'
 import BoardService from "../services/BoardService"
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-
 
 const ReadBoardComponent = ({ match }) => {
   const {no, pageno} = match.params;
@@ -78,6 +75,12 @@ const ReadBoardComponent = ({ match }) => {
     }
   };
 
+  const Viewer = ({content}) => (
+    <div
+      dangerouslySetInnerHTML={{ __html: content }}
+    ></div>
+  );
+
   return (
     <CRow>
       <CCol xs={12}>
@@ -108,13 +111,11 @@ const ReadBoardComponent = ({ match }) => {
                 </div>
                 <div className="mb-3">
                   <CFormLabel htmlFor="Input3">Contents</CFormLabel>
-                  <CKEditor
-                    editor={ClassicEditor}
-                    data={data.board.contents}
-                    onReady={(editor) => {
-                      editor.isReadOnly = true;
-                    }}
-                  />
+                  <CCard className="mb-4">
+                    <CCardBody>
+                      <Viewer content={data.board.contents}/>  
+                    </CCardBody>
+                  </CCard>                  
                 </div>
                 <div className="mb-3">
                   <CFormLabel htmlFor="Input4">Member No</CFormLabel>

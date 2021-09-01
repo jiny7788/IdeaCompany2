@@ -13,8 +13,7 @@ import {
   CFormSelect,
 } from '@coreui/react'
 import BoardService from "../services/BoardService"
-import { CKEditor } from "@ckeditor/ckeditor5-react";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import TextEditor from './TextEditor';
 
 
 class CreateBoardComponent extends Component {
@@ -68,16 +67,27 @@ class CreateBoardComponent extends Component {
     }));
   };
 
-  changeContentsHandler = (event, editor) => {
-    const content = editor.getData();
+  // changeContentsHandler = (event, editor) => {
+  //   const content = editor.getData();
+  //   this.setState(prev => ({
+  //       ...prev,
+  //       board: {
+  //         ...prev.board,
+  //         contents:content,
+  //       }
+  //     }));
+  // };
+
+  changeContentsHandler = (data) => {
+    console.log(data);
     this.setState(prev => ({
-        ...prev,
-        board: {
-          ...prev.board,
-          contents:content,
-        }
-      }));
-  };
+           ...prev,
+           board: {
+             ...prev.board,
+             contents:data,
+           }
+         }));
+  }
 
   createBoard = (event) => {
     //console.log("board => " + JSON.stringify(this.state.board));
@@ -126,9 +136,8 @@ class CreateBoardComponent extends Component {
                 </div>
                 <div className="mb-3">
                   <CFormLabel htmlFor="Input3">Contents</CFormLabel>
-                  <CKEditor
-                    editor={ClassicEditor}
-                    data={this.state.board.contents}
+                  <TextEditor
+                    value={this.state.board.contents}
                     onChange={this.changeContentsHandler}
                   />
                 </div>
