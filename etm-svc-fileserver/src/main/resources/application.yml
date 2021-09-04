@@ -1,0 +1,35 @@
+info:
+  app:
+    name: ^project.artifactId^
+    description: ^project.description^
+    version: ^project.version^
+    
+server:
+  port: 8094
+
+spring:
+  application:
+    name: ^project.artifactId^
+  db:
+    hikari:
+      driver-class-name: org.postgresql.Driver
+      jdbc-url: jdbc:postgresql://pgsql:5432/mytestdb
+      username: mytest
+      password: a12345!
+      minimumIdle: 30
+      maximumPoolSize: 30
+      connectionTestQuery: select 1
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://etm-infra-eureka:8761/eureka
+  instance:
+    preferIpAddress: true
+    
+etm:
+  fileserver:
+    nfs:
+      path: c:/temp
