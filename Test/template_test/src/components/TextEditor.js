@@ -67,7 +67,7 @@ class MyUploadAdapter {
     constructor(props) {
       this.loader = props;
       // URL where to send files.
-      this.url = `http://localhost:8090/test/fileUpload`;
+      this.url = `http://localhost:8094/fileserver/fileUpload`;
     }
 
     // Starts the upload process.

@@ -13,7 +13,7 @@ import {
   CFormSelect,
 } from '@coreui/react'
 import BoardService from "../services/BoardService"
-import TextEditor from './TextEditor';
+import TextEditor from './TextEditor1';
 
 
 class CreateBoardComponent extends Component {
@@ -68,7 +68,7 @@ class CreateBoardComponent extends Component {
   };
 
   changeContentsHandler = (data) => {
-    console.log(data);
+    //console.log(data);
     this.setState(prev => ({
            ...prev,
            board: {
