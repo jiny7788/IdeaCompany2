@@ -1,0 +1,1 @@
+export const REST_API_URL = 'http://api.secudiumiot.com:8200/control';

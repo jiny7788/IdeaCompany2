@@ -1,25 +1,47 @@
 import logo from './logo.svg';
 import './App.css';
+import React, {Component} from 'react';
+import Viewer from './viewer/Viewer';
+import GltfViewer from './viewer/GltfViewer';
+import IterationSample from './component/IterationSample';
+import GltfViewer1 from './viewer/GltfViewer1';
+import Counter from './component/Counter';
+import Counter1 from './component/Counter1';
+import AlarmListContainer from './component/AlarmListContainer';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import { connect  } from "react-redux";
+import * as imageActions from "./actions/ImageActions";
+
+class App extends Component {
+  render() {
+    const { gltfFile, loadImage } = this.props;
+    console.log(this.props);
+
+    return (
+      <div id="App" className="App">
+        <IterationSample onChangeFile={(fn) => loadImage(fn)} />
+        <Counter />
+        <div className='AlarmList' style={{ textAlign: 'center', border: '1px solid blue'}} >
+          <AlarmListContainer />
+        </div>        
+        <div className='3DMap' style={{ width: '80%', height: '500px' }}>
+            <GltfViewer1 />
+        </div> 
+      </div>
+    );
+  }
 }
 
-export default App;
+const mapStateToProps = (state) => ({
+  gltfFile: state.imageLoader.gltfFile
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  loadImage: (fileName) => dispatch(imageActions.loadImage(fileName))
+});
+
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App);
