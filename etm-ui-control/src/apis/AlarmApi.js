@@ -47,4 +47,8 @@ const getAlarmList2 = async (bodyFormData) => {
     }
 };
 
-export default { getAlarmList, getAlarmList2 }; 
+function getPostAPI(postId) {
+    return axios.get(`https://jsonplaceholder.typicode.com/posts/${postId}`);
+}
+
+export default { getAlarmList, getAlarmList2, getPostAPI }; 

@@ -27,3 +27,12 @@ export const DECREMENT = 'DECREMENT';
 */
 export const increment = createAction(INCREMENT, (diff) => (diff));
 export const decrement = createAction(DECREMENT, (diff) => (diff));
+
+// Redux-Thunk를 이용해서 객체가 아닌 함수를 dispath 할 수 있도록 함
+export const incrementAsync = (diff) => dispatch => {
+    setTimeout( () => { dispatch(increment(diff))}, 3000);
+}
+
+export const decrementAsync = (diff) => dispatch => {
+    setTimeout( ()=>{dispatch(decrement(diff))}, 3000);
+}

@@ -30,5 +30,3 @@ export const counter = handleActions({
         number: state.number - action.payload
     })
 }, initialState);
-
-
