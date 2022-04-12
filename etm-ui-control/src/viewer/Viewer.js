@@ -1,185 +1,116 @@
-import React from "react";
+import { useEffect } from 'react';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-let camera, scene, renderer;
-let plane;
-let pointer, raycaster, isShiftDown = false;
+import Stats from 'three/examples/jsm/libs/stats.module.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 
-let rollOverMesh, rollOverMaterial;
-let cubeGeo, cubeMaterial;
+let camera, scene, renderer, stats;
+const clock = new THREE.Clock();
+let mixer;
 
-const objects = [];
+function Viewer() {
 
-function render() {
-    renderer.render(scene, camera);
+    useEffect(() => {
+        const container = document.getElementById('viewer');
+
+        camera = new THREE.PerspectiveCamera( 45, container.clientWidth / container.clientHeight, 1, 2000 );
+		camera.position.set( 100, 200, 300 );
+
+        scene = new THREE.Scene();
+		scene.background = new THREE.Color( 0xa0a0a0 );
+		scene.fog = new THREE.Fog( 0xa0a0a0, 200, 1000 );
+
+        const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
+		hemiLight.position.set( 0, 200, 0 );
+		scene.add( hemiLight );
+
+        const dirLight = new THREE.DirectionalLight( 0xffffff );
+        dirLight.position.set( 0, 200, 100 );
+        dirLight.castShadow = true;
+        dirLight.shadow.camera.top = 180;
+        dirLight.shadow.camera.bottom = - 100;
+        dirLight.shadow.camera.left = - 120;
+        dirLight.shadow.camera.right = 120;
+        scene.add( dirLight );
+        
+        const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+        mesh.rotation.x = - Math.PI / 2;
+        mesh.receiveShadow = true;
+        scene.add( mesh );
+
+        const grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
+        grid.material.opacity = 0.2;
+        grid.material.transparent = true;
+        scene.add( grid );
+
+        
+        const loader = new FBXLoader();
+        loader.load( 'models/fbx/Samba Dancing.fbx', function ( object ) {
+
+            console.log(object);
+
+            mixer = new THREE.AnimationMixer( object );
+
+            const action = mixer.clipAction( object.animations[ 0 ] );
+            action.play();
+
+            object.traverse( function ( child ) {
+
+                if ( child.isMesh ) {
+
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+
+                }
+
+            } );
+
+            scene.add( object );
+
+        } );       
+        
+        renderer = new THREE.WebGLRenderer( { antialias: true } );
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( container.clientWidth, container.clientHeight );
+        renderer.shadowMap.enabled = true;
+        container.appendChild( renderer.domElement );
+
+        const controls = new OrbitControls( camera, renderer.domElement );
+        controls.target.set( 0, 100, 0 );
+        controls.update();
+
+        window.addEventListener( 'resize', onWindowResize );
+
+        stats = new Stats();
+        container.appendChild( stats.dom );
+
+        animate();
+    }, []);
+
+    return (
+        <div id="viewer" style={{ width: '100%', height: '100%', border: '1px solid blue' }} />
+    );
 }
 
-class Viewer extends React.Component {
-    constructor(props) {
-        super(props);
-      }
-    
-      componentDidMount() {
-    
-        camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-          camera.position.set( 500, 800, 1300 );
-          camera.lookAt( 0, 0, 0 );
-    
-          scene = new THREE.Scene();
-          scene.background = new THREE.Color( 0xf0f0f0 );
-    
-          // roll-over helpers
-    
-          const rollOverGeo = new THREE.BoxGeometry( 50, 50, 50 );
-          rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
-          rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
-          scene.add( rollOverMesh );
-    
-          // cubes
-    
-          cubeGeo = new THREE.BoxGeometry( 50, 50, 50 );
-          cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c, map: new THREE.TextureLoader().load( 'textures/square-outline-textured.png' ) } );
-    
-          // grid
-    
-          const gridHelper = new THREE.GridHelper( 1000, 20 );
-          scene.add( gridHelper );
-    
-          //
-    
-          raycaster = new THREE.Raycaster();
-          pointer = new THREE.Vector2();
-    
-          const geometry = new THREE.PlaneGeometry( 1000, 1000 );
-          geometry.rotateX( - Math.PI / 2 );
-    
-          plane = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { visible: false } ) );
-          scene.add( plane );
-    
-          objects.push( plane );
-    
-          // lights
-    
-          const ambientLight = new THREE.AmbientLight( 0x606060 );
-          scene.add( ambientLight );
-    
-          const directionalLight = new THREE.DirectionalLight( 0xffffff );
-          directionalLight.position.set( 1, 0.75, 0.5 ).normalize();
-          scene.add( directionalLight );
-    
-          renderer = new THREE.WebGLRenderer( { antialias: true } );
-          renderer.setPixelRatio( window.devicePixelRatio );
-          renderer.setSize( window.innerWidth, window.innerHeight );
-    
-          let orbit = new OrbitControls(camera, renderer.domElement);
-          orbit.enableZoom = true;
-          orbit.enabled = true;
-    
-          this.element.appendChild(renderer.domElement);
-    
-        document.addEventListener( 'pointermove', this.onPointerMove );
-        document.addEventListener( 'pointerdown', this.onPointerDown );
-        document.addEventListener( 'keydown', this.onDocumentKeyDown );
-        document.addEventListener( 'keyup', this.onDocumentKeyUp );
-    
-        window.addEventListener( 'resize', this.onWindowResize );    
-    
-        render();
-      }
-    
-      onWindowResize() {    
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize( window.innerWidth, window.innerHeight );  
-    
-        renderer.render(scene, camera);
-          
-        console.log("Width:" + window.innerWidth + ", Height:" + window.innerHeight);
-      }
-      
-      onPointerMove( event ) {
-        pointer.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
-        raycaster.setFromCamera( pointer, camera );  
-        const intersects = raycaster.intersectObjects( objects, false );
-      
-        if ( intersects.length > 0 ) {  
-          const intersect = intersects[ 0 ];
-      
-          rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
-          rollOverMesh.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
-      
-          render();
-        }  
-      }
-      
-      onPointerDown( event ) {
-      
-        pointer.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
-        raycaster.setFromCamera( pointer, camera );
-      
-        const intersects = raycaster.intersectObjects( objects, false );
-      
-        if ( intersects.length > 0 ) {
-      
-          const intersect = intersects[ 0 ];
-      
-          // delete cube
-      
-          if ( isShiftDown ) {
-      
-            if ( intersect.object !== plane ) {
-      
-              scene.remove( intersect.object );
-      
-              objects.splice( objects.indexOf( intersect.object ), 1 );
-      
-            }
-      
-            // create cube
-      
-          } else {
-      
-            const voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
-            voxel.position.copy( intersect.point ).add( intersect.face.normal );
-            voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
-            scene.add( voxel );
-      
-            objects.push( voxel );
-      
-          }
-      
-          render();
-      
-        }
-      
-      }
-      
-      onDocumentKeyDown( event ) {
-      
-        switch ( event.keyCode ) {
-      
-          case 16: isShiftDown = true; break;
-      
-        }
-      
-      }
-      
-      onDocumentKeyUp( event ) {
-      
-        switch ( event.keyCode ) {
-      
-          case 16: isShiftDown = false; break;
-      
-        }
-      
-      }  
-    
-       render() {
-        return (
-          <div ref={el => this.element = el} style={{ width: '100%', height: '100%', border: '1px solid red' }} />
-        );
-      }
-}
+function onWindowResize() {
+    const container = document.getElementById('viewer');
+
+    camera.aspect = container.clientWidth / container.clientHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( container.clientWidth, container.clientHeight );
+};
+
+function animate() {
+    requestAnimationFrame( animate );
+    const delta = clock.getDelta();
+
+    if ( mixer ) mixer.update( delta );
+
+    renderer.render( scene, camera );
+
+    stats.update();
+};
 
 export default Viewer;

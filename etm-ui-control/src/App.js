@@ -101,8 +101,8 @@ class App extends Component {
           <AlarmListContainer />
         </div>
         */}        
-        <div className='3DMap' style={{ width: '1000px', height: '600px' }}>
-            <GltfViewer1 />
+        <div className='3DMap' style={{ width: '50%', height: '600px' }}>
+            <Viewer />
         </div> 
       </div>
     );
