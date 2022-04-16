@@ -2,6 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import React, {Component} from 'react';
 import Viewer from './viewer/Viewer';
+import Viewer1 from './viewer/Viewer1';
 import GltfViewer from './viewer/GltfViewer';
 import IterationSample from './component/IterationSample';
 import GltfViewer1 from './viewer/GltfViewer1';

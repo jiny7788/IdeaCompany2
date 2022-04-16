@@ -3,9 +3,11 @@ import * as THREE from 'three';
 
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 
-let camera, scene, renderer, stats;
+import {Content} from './Content';
+
+
+let camera, scene, renderer, stats, controls, loadedObject, tube;
 const clock = new THREE.Clock();
 let mixer;
 
@@ -14,11 +16,28 @@ function Viewer() {
     useEffect(() => {
         const container = document.getElementById('viewer');
 
-        camera = new THREE.PerspectiveCamera( 45, container.clientWidth / container.clientHeight, 1, 2000 );
-		camera.position.set( 100, 200, 300 );
+        const content = new Content();
+        scene = content.scene;
+        mixer = content.mixer;
+        loadedObject = content.loadedObject;
 
-        scene = new THREE.Scene();
-		scene.background = new THREE.Color( 0xa0a0a0 );
+        /*
+        camera = new THREE.PerspectiveCamera( 45, container.clientWidth / container.clientHeight, 0.25, 50 );
+		camera.position.set(- 1.8, 0.6, 2.7);        
+
+        scene.background = new THREE.Color( 0xa0a0a0 );
+		scene.fog = new THREE.Fog( 0xa0a0a0, 200, 1000 );
+
+        const light = new THREE.PointLight( 0xffffff, 1 );
+        scene.add( camera );
+        camera.add( light );
+        */
+
+        camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
+		camera.position.set( 10, 10, 10 );
+        camera.lookAt(new THREE.Vector3(0, -2, 0));
+
+        scene.background = new THREE.Color( 0xa0a0a0 );
 		scene.fog = new THREE.Fog( 0xa0a0a0, 200, 1000 );
 
         const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
@@ -33,42 +52,55 @@ function Viewer() {
         dirLight.shadow.camera.left = - 120;
         dirLight.shadow.camera.right = 120;
         scene.add( dirLight );
+
+        var axes = new THREE.AxisHelper(2);
+        scene.add(axes);
+
+        // const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
+        // mesh.rotation.x = - Math.PI / 2;
+        // mesh.receiveShadow = true;
+        // scene.add( mesh );
+
+        // const grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
+        // grid.material.opacity = 0.2;
+        // grid.material.transparent = true;
+        // scene.add( grid );
         
-        const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
-        mesh.rotation.x = - Math.PI / 2;
-        mesh.receiveShadow = true;
-        scene.add( mesh );
+        /*
+        scene.background = new THREE.Color( 0x8cc7de );
 
-        const grid = new THREE.GridHelper( 2000, 20, 0x000000, 0x000000 );
-        grid.material.opacity = 0.2;
-        grid.material.transparent = true;
-        scene.add( grid );
+        //Camera
+        camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        camera.position.z = - 70;
+        camera.position.y = 25;
+        camera.position.x = 90;
 
-        
-        const loader = new FBXLoader();
-        loader.load( 'models/fbx/Samba Dancing.fbx', function ( object ) {
+        //Initial cube
+        const geometry = new THREE.BoxGeometry();
+        const material = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+        const cube = new THREE.Mesh( geometry, material );
+        scene.add( cube );
 
-            console.log(object);
+        //Lights
+        const directionalLight1 = new THREE.DirectionalLight( 0xffeeff, 0.8 );
+        directionalLight1.position.set( 1, 1, 1 );
+        scene.add( directionalLight1 );
 
-            mixer = new THREE.AnimationMixer( object );
+        const directionalLight2 = new THREE.DirectionalLight( 0xffffff, 0.8 );
+        directionalLight2.position.set( - 1, 0.5, - 1 );
+        scene.add( directionalLight2 );
 
-            const action = mixer.clipAction( object.animations[ 0 ] );
-            action.play();
+        const ambientLight = new THREE.AmbientLight( 0xffffee, 0.25 );
+        scene.add( ambientLight );
+        */
 
-            object.traverse( function ( child ) {
-
-                if ( child.isMesh ) {
-
-                    child.castShadow = true;
-                    child.receiveShadow = true;
-
-                }
-
-            } );
-
-            scene.add( object );
-
-        } );       
+        // 여기서 model을 load한다. 
+        //content.loader.loadFile('models/fbx/Samba Dancing.fbx');
+        //content.loader.loadFile('models/gltf/LittlestTokyo.glb');
+        content.loader.loadFile('models/gltf/LeePerrySmith/LeePerrySmith.glb');
+        //content.loader.loadFile('models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf');
+        //content.loader.loadFile('models/gltf/MaterialsVariantsShoe/glTF/MaterialsVariantsShoe.gltf'); 
+        //content.loader.loadFile('models/ifc/rac_advanced_sample_project.ifc');     
         
         renderer = new THREE.WebGLRenderer( { antialias: true } );
         renderer.setPixelRatio( window.devicePixelRatio );
@@ -76,14 +108,23 @@ function Viewer() {
         renderer.shadowMap.enabled = true;
         container.appendChild( renderer.domElement );
 
-        const controls = new OrbitControls( camera, renderer.domElement );
-        controls.target.set( 0, 100, 0 );
+        controls = new OrbitControls( camera, renderer.domElement );
+        controls.target.set( 0, 0, 0 );
         controls.update();
+        controls.enablePan = true;
+        controls.enableDamping = true;
 
         window.addEventListener( 'resize', onWindowResize );
 
+        // mouse down, move로 객체를 선택한다.
+        container.addEventListener('mousedown', onDocumentMouseDown, false);
+        container.addEventListener('mousemove', onDocumentMouseMove, false);
+
+
         stats = new Stats();
         container.appendChild( stats.dom );
+
+        //console.log(scene.children);
 
         animate();
     }, []);
@@ -102,15 +143,77 @@ function onWindowResize() {
     renderer.setSize( container.clientWidth, container.clientHeight );
 };
 
+function onDocumentMouseDown(event) {
+    const container = document.getElementById('viewer');
+
+    let vector = new THREE.Vector3(( event.clientX / container.clientWidth ) * 2 - 1, -( event.clientY / container.clientHeight ) * 2 + 1, 0.5);
+    vector = vector.unproject(camera);
+
+    let raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
+
+    let intersects = raycaster.intersectObjects(loadedObject);
+
+    if (intersects.length > 0) {
+
+        console.log('onDocumentMouseDown', intersects[0]);
+
+        if( intersects[0].object.visible  ) {
+            // 이미 선택되었던 객체이면 원상 복귀(불투명)
+            intersects[0].object.visible = false;
+        } else {
+            // 선택된 객체를 투명하게 한다. 
+            intersects[0].object.visible  = true; 
+        }                
+ 
+    }
+}
+
+function onDocumentMouseMove(event) {
+    const container = document.getElementById('viewer');
+
+    if ( true ) {
+        let vector = new THREE.Vector3(( event.clientX / container.clientWidth ) * 2 - 1, -( event.clientY / container.clientHeight ) * 2 + 1, 0.5);
+        vector = vector.unproject(camera);
+        console.log(vector);
+
+        let raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
+        let intersects = raycaster.intersectObjects(loadedObject);
+
+
+        if (intersects.length > 0) {
+
+            //console.log('onDocumentMouseMove', loadedObject);
+            console.log(intersects[0]);
+
+            let points = [];
+            points.push(new THREE.Vector3(-2, 2, 2));
+            points.push(intersects[0].point);
+
+            let mat = new THREE.MeshBasicMaterial({color: 0xff0000, transparent: true, opacity: 0.6});
+            let tubeGeometry = new THREE.TubeGeometry(new THREE.SplineCurve(points), 60, 0.001);
+
+            if (tube) scene.remove(tube);
+
+            if (controls.showRay) {
+                tube = new THREE.Mesh(tubeGeometry, mat);
+                scene.add(tube);
+            }
+        }
+    }
+}
+
+
+
 function animate() {
     requestAnimationFrame( animate );
     const delta = clock.getDelta();
 
     if ( mixer ) mixer.update( delta );
 
-    renderer.render( scene, camera );
-
+    controls.update();
     stats.update();
+
+    renderer.render( scene, camera );
 };
 
 export default Viewer;
