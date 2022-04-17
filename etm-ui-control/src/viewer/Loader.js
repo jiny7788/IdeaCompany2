@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-//import { IFCLoader } from 'three/examples/jsm/loaders/IFCLoader.js';
+import { IFCLoader } from 'three/examples/jsm/loaders/IFCLoader.js';
 // import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js';
 // import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 

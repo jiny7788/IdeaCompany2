@@ -10,7 +10,7 @@ import {PLYLoader} from 'three/examples/jsm/loaders/PLYLoader.js';
 
 
 
-let mixer, stats, renderer, scene, camera, controls ;
+let mixer, stats, renderer, scene, camera, controls, tracer ;
 const clock = new THREE.Clock();
 
 function Viewer1() {
@@ -21,27 +21,41 @@ function Viewer1() {
         stats = new Stats();
 		container.appendChild( stats.dom );
 
+        renderer = new THREE.WebGLRenderer({
+            antialias: true
+        });
+        renderer.setClearColor(0xFFFFFF);
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild( renderer.domElement );
+
         scene = new THREE.Scene();
 
-        camera = new THREE.PerspectiveCamera( 40, container.clientWidth / container.clientHeight, 0.1, 1000 );
-		camera.position.set( 5, 2, 8 );
+        var axes = new THREE.AxisHelper(200);
+        scene.add(axes);
 
-        renderer = new THREE.WebGLRenderer();
-        renderer.setClearColor(new THREE.Color(0x000, 1.0));
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.shadowMap.Enabled = true;
+        var cubeGeometry = new THREE.BoxGeometry(100, 100, 100);
+        var cubeMaterial = new THREE.MeshLambertMaterial({
+            color: 0x1ec876
+        });
+        var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+        cube.rotation.y = Math.PI * 45 / 180;
 
-        camera.position.x = 10;
-        camera.position.y = 10;
-        camera.position.z = 10;
-        camera.lookAt(new THREE.Vector3(0, -2, 0));
+        scene.add(cube);
 
-        const spotLight = new THREE.SpotLight(0xffffff);
-        spotLight.position.set(20, 20, 20);
-        scene.add(spotLight);
+        camera = new THREE.PerspectiveCamera( 45, container.clientWidth / container.clientHeight, 1, 10000 );
+        camera.position.y = 500;
+        camera.position.z = 500;
+        camera.lookAt(cube.position);
 
-        container.appendChild( renderer.domElement );
-        
+        var pointLight = new THREE.PointLight(0xffffff);
+        pointLight.position.set(0, 300, 200);
+        scene.add(pointLight);
+
+        var geometry = new THREE.CylinderGeometry(0, 20, 100, 3);
+        geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, 50, 0));
+        geometry.applyMatrix(new THREE.Matrix4().makeRotationX(Math.PI / 2));
+        tracer = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial());
+        scene.add(tracer);        
 
         controls = new OrbitControls( camera, renderer.domElement );
         controls.target.set( 0, 0, 0 );
@@ -49,33 +63,10 @@ function Viewer1() {
         controls.enablePan = false;
         controls.enableDamping = true;
 
-        const manager = new THREE.LoadingManager();
-        manager.onError = function ( url ) {
-            console.log( 'There was an error loading ' + url );
-        };
-
-        const loader = new PLYLoader();
-        var group = new THREE.Object3D();
-        loader.load( 'assets/models/test.ply', function ( geometry ) {
-
-            var material = new THREE.PointCloudMaterial({
-                color: 0xffffff,
-                size: 0.4,
-                opacity: 0.6,
-                transparent: true,
-                blending: THREE.AdditiveBlending,
-                map: generateSprite()
-            });
-
-            group = new THREE.PointCloud(geometry, material);
-            group.sortParticles = true;
-
-            scene.add(group);
-
-            animate();
-         });
-
         window.addEventListener( 'resize', onWindowResize );
+        container.addEventListener('mousemove', onMouseMove, false)
+
+        animate();
 
     }, []);
 
@@ -84,26 +75,19 @@ function Viewer1() {
     );
 }
 
-function generateSprite() {
+function onMouseMove(event) {
+//    var mouse = new THREE.Vector2();
+    var vector = new THREE.Vector3();
 
-    var canvas = document.createElement('canvas');
-    canvas.width = 16;
-    canvas.height = 16;
+//    mouse.x = ( (event.clientX - renderer.domElement.getBoundingClientRect().left ) / renderer.domElement.width ) * 2 - 1;
+//    mouse.y = - ( (event.clientY - renderer.domElement.getBoundingClientRect().top) / renderer.domElement.height ) * 2 + 1;
+    vector.set( ( (event.clientX - renderer.domElement.getBoundingClientRect().left ) / renderer.domElement.width ) * 2 - 1, - ( (event.clientY - renderer.domElement.getBoundingClientRect().top) / renderer.domElement.height ) * 2 + 1, 0.5 );
+    vector.unproject( camera );
+    var dir = vector.sub( camera.position ).normalize();
+    var distance = - camera.position.z / dir.z;
+    tracer.position.copy( camera.position ).add( dir.multiplyScalar( distance ) );
 
-    var context = canvas.getContext('2d');
-    var gradient = context.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2);
-    gradient.addColorStop(0, 'rgba(255,255,255,1)');
-    gradient.addColorStop(0.2, 'rgba(0,255,255,1)');
-    gradient.addColorStop(0.4, 'rgba(0,0,64,1)');
-    gradient.addColorStop(1, 'rgba(0,0,0,1)');
-
-    context.fillStyle = gradient;
-    context.fillRect(0, 0, canvas.width, canvas.height);
-
-    var texture = new THREE.Texture(canvas);
-    texture.needsUpdate = true;
-    return texture;
-
+    console.log('onMouseMove', tracer.position);
 }
 
 function onWindowResize() {
@@ -119,10 +103,14 @@ function animate() {
     requestAnimationFrame( animate );
     const delta = clock.getDelta();
 
-    controls.update();
+    //controls.update();
     stats.update();
 
     renderer.render( scene, camera );
 };
 
 export default Viewer1;
+
+
+// https://github.com/tamani-coding/threejs-raycasting
+// https://www.youtube.com/watch?v=a0qSHBnqORU

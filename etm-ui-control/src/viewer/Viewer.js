@@ -97,8 +97,8 @@ function Viewer() {
         // 여기서 model을 load한다. 
         //content.loader.loadFile('models/fbx/Samba Dancing.fbx');
         //content.loader.loadFile('models/gltf/LittlestTokyo.glb');
-        //content.loader.loadFile('models/gltf/LeePerrySmith/LeePerrySmith.glb');
-        content.loader.loadFile('models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf');
+        content.loader.loadFile('models/gltf/LeePerrySmith/LeePerrySmith.glb');
+        //content.loader.loadFile('models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf');
         //content.loader.loadFile('models/gltf/MaterialsVariantsShoe/glTF/MaterialsVariantsShoe.gltf'); 
         //content.loader.loadFile('models/ifc/rac_advanced_sample_project.ifc');     
         

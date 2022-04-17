@@ -103,7 +103,7 @@ class App extends Component {
         </div>
         */}        
         <div className='3DMap' style={{ width: '50%', height: '600px' }}>
-            <Viewer />
+            <Viewer1 />
         </div> 
       </div>
     );
