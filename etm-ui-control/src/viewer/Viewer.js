@@ -34,8 +34,8 @@ function Viewer() {
         */
 
         camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
-		camera.position.set( 10, 10, 10 );
-        camera.lookAt(new THREE.Vector3(0, -2, 0));
+		camera.position.set( 0, 0, 10 );
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
 
         scene.background = new THREE.Color( 0xa0a0a0 );
 		scene.fog = new THREE.Fog( 0xa0a0a0, 200, 1000 );
@@ -53,7 +53,7 @@ function Viewer() {
         dirLight.shadow.camera.right = 120;
         scene.add( dirLight );
 
-        var axes = new THREE.AxisHelper(2);
+        var axes = new THREE.AxisHelper(20);
         scene.add(axes);
 
         // const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000 ), new THREE.MeshPhongMaterial( { color: 0x999999, depthWrite: false } ) );
@@ -97,8 +97,8 @@ function Viewer() {
         // 여기서 model을 load한다. 
         //content.loader.loadFile('models/fbx/Samba Dancing.fbx');
         //content.loader.loadFile('models/gltf/LittlestTokyo.glb');
-        content.loader.loadFile('models/gltf/LeePerrySmith/LeePerrySmith.glb');
-        //content.loader.loadFile('models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf');
+        //content.loader.loadFile('models/gltf/LeePerrySmith/LeePerrySmith.glb');
+        content.loader.loadFile('models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf');
         //content.loader.loadFile('models/gltf/MaterialsVariantsShoe/glTF/MaterialsVariantsShoe.gltf'); 
         //content.loader.loadFile('models/ifc/rac_advanced_sample_project.ifc');     
         
@@ -118,7 +118,8 @@ function Viewer() {
 
         // mouse down, move로 객체를 선택한다.
         container.addEventListener('mousedown', onDocumentMouseDown, false);
-        container.addEventListener('mousemove', onDocumentMouseMove, false);
+        //container.addEventListener('mousemove', onDocumentMouseMove, false);
+        //container.addEventListener('pointerdown', onPointerDown);
 
 
         stats = new Stats();
@@ -144,9 +145,8 @@ function onWindowResize() {
 };
 
 function onDocumentMouseDown(event) {
-    const container = document.getElementById('viewer');
-
-    let vector = new THREE.Vector3(( event.clientX / container.clientWidth ) * 2 - 1, -( event.clientY / container.clientHeight ) * 2 + 1, 0.5);
+    // !!!! 중요 !!!! 실제 그려지는 박스의 최상단 좌측의 좌표를 기준으로 계산해야 한다.
+    let vector = new THREE.Vector3(( (event.clientX - renderer.domElement.getBoundingClientRect().left) / renderer.domElement.clientWidth ) * 2 - 1, -( (event.clientY-renderer.domElement.getBoundingClientRect().top) / renderer.domElement.clientHeight ) * 2 + 1, 0.5);
     vector = vector.unproject(camera);
 
     let raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
@@ -169,24 +169,22 @@ function onDocumentMouseDown(event) {
 }
 
 function onDocumentMouseMove(event) {
-    const container = document.getElementById('viewer');
+    // !!!! 중요 !!!! 실제 그려지는 박스의 최상단 좌측의 좌표를 기준으로 계산해야 한다.
 
     if ( true ) {
-        let vector = new THREE.Vector3(( event.clientX / container.clientWidth ) * 2 - 1, -( event.clientY / container.clientHeight ) * 2 + 1, 0.5);
+        let vector = new THREE.Vector3(( (event.clientX - renderer.domElement.getBoundingClientRect().left) / renderer.domElement.clientWidth ) * 2 - 1, -( (event.clientY - renderer.domElement.getBoundingClientRect().top) / renderer.domElement.clientHeight ) * 2 + 1, 0.5);
         vector = vector.unproject(camera);
-        console.log(vector);
+        //console.log(vector);
 
         let raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
         let intersects = raycaster.intersectObjects(loadedObject);
 
 
         if (intersects.length > 0) {
-
-            //console.log('onDocumentMouseMove', loadedObject);
             console.log(intersects[0]);
 
             let points = [];
-            points.push(new THREE.Vector3(-2, 2, 2));
+            points.push(new THREE.Vector3(0, 0, 20));
             points.push(intersects[0].point);
 
             let mat = new THREE.MeshBasicMaterial({color: 0xff0000, transparent: true, opacity: 0.6});
@@ -194,7 +192,7 @@ function onDocumentMouseMove(event) {
 
             if (tube) scene.remove(tube);
 
-            if (controls.showRay) {
+            if (true) {
                 tube = new THREE.Mesh(tubeGeometry, mat);
                 scene.add(tube);
             }
@@ -202,6 +200,29 @@ function onDocumentMouseMove(event) {
     }
 }
 
+function onPointerDown(event) {
+    // !!!! 중요 !!!! 실제 그려지는 박스의 최상단 좌측의 좌표를 기준으로 계산해야 한다.
+    let vector = new THREE.Vector3(( (event.clientX - renderer.domElement.getBoundingClientRect().left) / renderer.domElement.clientWidth ) * 2 - 1, -( (event.clientY - renderer.domElement.getBoundingClientRect().top) / renderer.domElement.clientHeight ) * 2 + 1, 0.5);
+    vector = vector.unproject(camera);
+
+    //console.log('onPointerDown', event.clientX, event.clientY, renderer.domElement.clientWidth, renderer.domElement.clientHeight, vector);
+
+    const raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
+    const intersects = raycaster.intersectObjects( loadedObject );
+    if ( intersects.length > 0 ) {
+        const object = intersects[ 0 ].object;
+        object.material.color.set(0xff4500);
+/*
+        if( bRed  ) {
+            // 이미 선택되었던 객체이면 원상 복귀(불투명)
+            object.visible = false;
+        } else {
+            // 선택된 객체를 투명하게 한다. 
+            object.visible  = true; 
+        }   
+*/
+    }
+}
 
 
 function animate() {

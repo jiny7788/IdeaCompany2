@@ -4,6 +4,7 @@
 /node_modules
 /public/models
 /public/textures
+/public/assets
 /.pnp
 .pnp.js
 

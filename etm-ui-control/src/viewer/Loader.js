@@ -80,14 +80,14 @@ function Loader( content ) {
                 });
             }
                 
-            // case 'ifc': {
-            //     const loader = new IFCLoader(manager);
-			// 	loader.ifcManager.setWasmPath( 'three/examples/jsm/loaders/ifc/' );
-            //     loader.load(filePath, function(model) {
-            //         model.mesh.name = filePath;
-            //         content.addObject(model.mesh);
-            //     });
-            // }
+            case 'ifc': {
+                const loader = new IFCLoader(manager);
+			 	loader.ifcManager.setWasmPath( 'three/examples/jsm/loaders/ifc/' );
+                loader.load(filePath, function(model) {
+                    model.mesh.name = filePath;
+                    content.addObject(model.mesh);
+                });
+            }
         }
 
     }; 
