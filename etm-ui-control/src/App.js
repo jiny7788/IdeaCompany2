@@ -3,6 +3,7 @@ import './App.css';
 import React, {Component} from 'react';
 import Viewer from './viewer/Viewer';
 import Viewer1 from './viewer/Viewer1';
+import Viewer4 from './viewer/Viewer4';
 import GltfViewer from './viewer/GltfViewer';
 import IterationSample from './component/IterationSample';
 import GltfViewer1 from './viewer/GltfViewer1';
@@ -77,6 +78,10 @@ class App extends Component {
     }
   }
 
+  onMouseOver = (event, userData) => {
+    console.log(`onMouseOver assetsId:${userData.assetsId}, assetsName:${userData.name}`);
+  };
+
   render() {
     const { loadImage, post, error, loading } = this.props;
     //console.log(this.props);
@@ -84,6 +89,7 @@ class App extends Component {
     return (
       <div id="App" className="App">
         <IterationSample onChangeFile={(fn) => loadImage(fn)} />
+        {/* 
         <Counter />
         {
           loading ? (<h2>로딩중...</h2>)
@@ -97,13 +103,12 @@ class App extends Component {
             )
           )
         }
-        {/* 
         <div className='AlarmList' style={{ textAlign: 'center', border: '1px solid blue'}} >
           <AlarmListContainer />
         </div>
         */}        
-        <div className='3DMap' style={{ width: '50%', height: '600px' }}>
-            <Viewer1 />
+        <div className='3DMap' style={{ width: '80%', height: '800px' }}>
+            <Viewer4 onMouseOver={this.onMouseOver}/>
         </div> 
       </div>
     );

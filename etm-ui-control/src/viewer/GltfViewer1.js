@@ -1,6 +1,9 @@
+import { render } from '@testing-library/react';
 import React, { useEffect } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { MapControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
@@ -8,6 +11,10 @@ import { useSelector } from 'react-redux';
 
 let camera, scene, renderer;
 let filePath;
+let controls, dragControls, group;
+const objects = [];
+let mouse, raycaster;
+let enableSelection = false;
 
 function GltfViewer1() {
 
@@ -18,7 +25,7 @@ function GltfViewer1() {
     }));
     
     useEffect(() => {
-        camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+        camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.25, 20 );
         camera.position.set(- 1.8, 0.6, 2.7);
         camera.layers.enable( 0 ); // enabled by default
         camera.layers.enable( 1 );
@@ -31,7 +38,10 @@ function GltfViewer1() {
 		light.layers.enable( 1 );
 
         scene.add( camera );
-        camera.add( light );
+        camera.add(light);
+        
+        mouse = new THREE.Vector2();
+        raycaster = new THREE.Raycaster();
         
         console.log("Load gltfFile: " + gltfFile);        
 
@@ -59,12 +69,13 @@ function GltfViewer1() {
                     
                     const model1 = SkeletonUtils.clone( gltf.scene );
 					const model2 = SkeletonUtils.clone( gltf.scene );
-                    const model3 = SkeletonUtils.clone(gltf.scene);
-                    
+                    const model3 = SkeletonUtils.clone( gltf.scene );
+                   
+
                     model1.position.x = - 2;
 					model2.position.x = 0;
                     model3.position.x = 2;
-                    
+
                     scene.add(model1, model2, model3);
                     
                     //camera.layers.toggle( 0 );
@@ -108,18 +119,29 @@ function GltfViewer1() {
         }
         document.getElementById('viewer').appendChild(renderer.domElement);
 
-        const controls = new OrbitControls( camera, renderer.domElement );
-        controls.addEventListener( 'change', render1 ); // use if there is no animation loop
-        controls.minDistance = 2;
-        controls.maxDistance = 10;
-        controls.target.set( 0, 0, - 0.2 );
-        controls.update();
+        // controls = new OrbitControls( camera, renderer.domElement );
+        // controls.addEventListener( 'change', render1 ); // use if there is no animation loop
+        // controls.minDistance = 2;
+        // controls.maxDistance = 10;
+        // controls.target.set( 0, 0, - 0.2 );
+        // controls.update();
 
+//         controls = new MapControls( camera, renderer.domElement );
+// //        controls.addEventListener( 'change', render1 ); // call this only in static scenes (i.e., if there is no animation loop)
+//         controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+//         controls.dampingFactor = 0.05;
+//         controls.screenSpacePanning = false;
+//         controls.minDistance = 100;
+//         controls.maxDistance = 500;
+//         controls.maxPolarAngle = Math.PI / 2;
         
+        dragControls = new DragControls( [ ... objects ], camera, renderer.domElement );
+        dragControls.addEventListener( 'drag', render1 );
 
         filePath = gltfFile;
 
         window.addEventListener('resize', onWindowResize);   
+        document.addEventListener( 'click', onClick );
         
         render1();
         
@@ -144,6 +166,62 @@ function onWindowResize() {
     renderer.setSize(document.getElementById('viewer').clientWidth, document.getElementById('viewer').clientHeight);
 
     render1();
+}
+
+// function animate() {
+//     requestAnimationFrame( animate );
+//     controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
+//     render1();
+// }
+
+function onClick( event ) {
+
+    event.preventDefault();
+
+    if ( enableSelection === true ) {
+
+        const draggableObjects = dragControls.getObjects();
+        draggableObjects.length = 0;
+
+        mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+        mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+        raycaster.setFromCamera( mouse, camera );
+
+        const intersections = raycaster.intersectObjects( objects, true );
+
+        if ( intersections.length > 0 ) {
+
+            const object = intersections[ 0 ].object;
+
+            if ( group.children.includes( object ) === true ) {
+
+                object.material.emissive.set( 0x000000 );
+                scene.attach( object );
+
+            } else {
+
+                object.material.emissive.set( 0xaaaaaa );
+                group.attach( object );
+
+            }
+
+            controls.transformGroup = true;
+            draggableObjects.push( group );
+
+        }
+
+        if ( group.children.length === 0 ) {
+
+            controls.transformGroup = false;
+            draggableObjects.push( ...objects );
+
+        }
+
+    }
+
+    render1();
+
 }
 
 function render1() {

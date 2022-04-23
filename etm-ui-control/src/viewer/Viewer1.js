@@ -111,6 +111,3 @@ function animate() {
 
 export default Viewer1;
 
-
-// https://github.com/tamani-coding/threejs-raycasting
-// https://www.youtube.com/watch?v=a0qSHBnqORU
