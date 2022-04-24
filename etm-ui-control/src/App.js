@@ -13,12 +13,19 @@ import AlarmListContainer from './component/AlarmListContainer';
 
 import { connect  } from "react-redux";
 import * as imageActions from "./actions/ImageActions";
-import * as postActions from "./actions/PostActions"
+import * as postActions from "./actions/PostActions";
+import * as mapActions from "./actions/MapActions";
 import { bindActionCreators } from 'redux';
 import AlarmsApi from './apis/AlarmApi';
 
 
 class App extends Component {
+
+  state = {
+    position: {},
+    scale: {},
+    rotation: {}
+  };
 
   // 방법 - 1 : then 사용
   // loadData = () => {
@@ -67,7 +74,8 @@ class App extends Component {
     } catch(e) {
     }
   }
-  
+
+ 
   componentDidMount() {
     this.loadData();
   }
@@ -78,9 +86,46 @@ class App extends Component {
     }
   }
 
-  onMouseOver = (event, userData) => {
+  onMouseOver = (event, userData) => {  // 객체위에 마우스가 갔을 때...
     console.log(`onMouseOver assetsId:${userData.assetsId}, assetsName:${userData.name}`);
   };
+
+  onChange = (changeObject) => {        // 객체에 변화가 생겼을 때 ...
+    console.log('onChange object:');
+    console.log(changeObject);
+  };
+
+  addFunc = () => {
+    const { mapActions  } = this.props;
+
+    mapActions.addAlarm([1, 2]);
+    // mapActions.changeObject({
+    //   assetsId:1, 
+    //   position: {
+    //     x: this.state.position.x,
+    //     y: this.state.position.y,
+    //     z: this.state.position.z
+    //   }
+    // });
+  };
+
+  delFunc = () => {
+    const { mapActions  } = this.props;
+
+    mapActions.removeAlarm([1]);    
+  }
+
+  handleChange = (e) => {
+    this.setState({
+      ...this.state,
+      position: {
+        ...this.state.position,
+        [e.target.name]: e.target.value
+      }
+    });
+
+    console.log(this.state.position);
+  }
 
   render() {
     const { loadImage, post, error, loading } = this.props;
@@ -88,8 +133,8 @@ class App extends Component {
 
     return (
       <div id="App" className="App">
-        <IterationSample onChangeFile={(fn) => loadImage(fn)} />
         {/* 
+        <IterationSample onChangeFile={(fn) => loadImage(fn)} />
         <Counter />
         {
           loading ? (<h2>로딩중...</h2>)
@@ -106,9 +151,13 @@ class App extends Component {
         <div className='AlarmList' style={{ textAlign: 'center', border: '1px solid blue'}} >
           <AlarmListContainer />
         </div>
-        */}        
+        */}
+        <div>
+          <button onClick={()=>this.addFunc()}>추가</button>
+          <button onClick={()=>this.delFunc()}>제거</button>
+        </div>        
         <div className='3DMap' style={{ width: '80%', height: '800px' }}>
-            <Viewer4 onMouseOver={this.onMouseOver}/>
+            <Viewer4 onMouseOver={this.onMouseOver} onChange={this.onChange} />
         </div> 
       </div>
     );
@@ -124,7 +173,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   loadImage: (fileName) => dispatch(imageActions.loadImage(fileName)),
-  postActions: bindActionCreators(postActions, dispatch)
+  postActions: bindActionCreators(postActions, dispatch),
+  mapActions: bindActionCreators(mapActions, dispatch)
 });
 
 

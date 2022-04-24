@@ -5,14 +5,17 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 
-
 import { Content } from './Content';
+
+import { connect  } from "react-redux";
 
 let camera, scene, renderer, panel, loadedObject, orbit, control;
 let curObject = null;       // 현재 선택된 객체
 let curMouseOver = null;    // 현재 mouse가 올라가 있는 객체
 let editMode = false;       // 편집 모드 
 let timer = null;
+let alarmLight = false;
+let alarmList = [];
 
 class Viewer4 extends React.Component {
 
@@ -20,6 +23,12 @@ class Viewer4 extends React.Component {
         super(props);
 
         this.onMouseOver = props.onMouseOver;
+        this.onChange = props.onChange;
+
+        this.state = {
+            alarmList: this.props.alarmList,
+            changeObject: this.props.changeObject
+        };
     }
 
     componentDidMount() {
@@ -59,7 +68,7 @@ class Viewer4 extends React.Component {
         //content.loader.loadFile('models/fbx/Samba Dancing.fbx');
         //content.loader.loadFile('models/gltf/LittlestTokyo.glb');
         //content.loader.loadFile('models/gltf/LeePerrySmith/LeePerrySmith.glb');
-        content.loader.loadFile('models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf');
+        //content.loader.loadFile('models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf');
         //content.loader.loadFile('models/gltf/Soldier.glb');        
         //content.loader.loadFile('models/gltf/MaterialsVariantsShoe/glTF/MaterialsVariantsShoe.gltf'); 
         //content.loader.loadFile('models/ifc/rac_advanced_sample_project.ifc');     
@@ -81,6 +90,10 @@ class Viewer4 extends React.Component {
         //content.loader.loadFile('samples/ResidentialBuildingSet/Residential Buildings 001.fbx');
         //content.loader.loadFile('samples/mnogohome/building.obj');
         
+        //content.loader.loadFile('samples/cctv/camera1.obj');
+        //content.loader.loadFile('samples/cctv/Security cameras v4.obj');
+        content.loader.loadFile('samples/cctv/Security cameras.obj');
+
         //content.loader.loadFile('models/fbx/dragon/Dragon_Baked_Actions_fbx_7.4_binary.fbx');
         //content.loader.loadFile('models/gltf/DamagedHelmet.zip');
         
@@ -133,6 +146,12 @@ class Viewer4 extends React.Component {
         clearInterval(timer);
     }
 
+    componentDidUpdate(prevProps, prevState){
+        //console.log("componentDidUpdate: " + JSON.stringify(prevProps) + " " + JSON.stringify(prevState));
+        console.log(this.props.alarmList);
+        alarmList = this.props.alarmList;
+    }
+
     // 기본 함수
     render() {
         return (
@@ -172,6 +191,42 @@ class Viewer4 extends React.Component {
     myTimer = () => {
         //console.log('timer callled...');
         // 여기서 깜빡임 처리 할 것임
+        alarmLight = ! alarmLight;
+
+        loadedObject.forEach( (alarmObject) => {
+            if( alarmList.findIndex( (item) => item === alarmObject.userData.assetsId ) >= 0)  
+            {   // 알람 자산을 찾으면...
+                this.Light(alarmObject, alarmLight);    
+            }
+
+        });
+    }
+
+    Light = (selObject, onoff) => {        
+        try {
+            if(onoff) 
+            {
+                console.log(`turn on : ${selObject.userData.name}(${selObject.userData.assetsId}) `);
+                selObject.traverse( function ( object ) {
+                    if (object.isMesh && object.userData.oldColor) {
+                        object.userData.oldColor = object.material.color.getHex();
+                        object.material.color.set(0xff0000);
+                    }
+                });
+                this.render1();
+            } else {
+                console.log('turn off');
+                selObject.traverse( function ( object ) {
+                    if (object.isMesh && object.userData.oldColor) {
+                        object.material.color.set(object.userData.oldColor);
+                    }
+                });
+                this.render1();
+            }
+            
+        } catch (e) {
+            //console.log(e);
+        }
     }
 
     createPanel = () => {
@@ -211,6 +266,19 @@ class Viewer4 extends React.Component {
                 if (!editMode) {    // 에디터 모드가 끝나면 선택된 객체를 해제한다.
                     if (curObject) {
                         control.detach();
+
+                        // 원래의 색깔로 되돌린다.
+                        try {
+                            curObject.traverse( function ( object ) {
+                                if (object.isMesh && object.userData.oldColor) {
+                                    object.material.color.set(object.userData.oldColor);
+                                }
+                            });
+                            this.render1();
+                        } catch (e) {
+                            //console.log(e);
+                        }                           
+
                         curObject = null;
                         renderer.render(scene, camera);
                     }
@@ -440,7 +508,7 @@ class Viewer4 extends React.Component {
                 while (parentObject.parent) {
                     if (parentObject.parent.uuid === scene.uuid) {
                         // 선택된 객체를 최상위 객체로 변경한다.
-                        parentObject = parentObject;
+                        //parentObject = parentObject;
                         break;
                     } else {
                         parentObject = parentObject.parent;
@@ -517,11 +585,23 @@ class Viewer4 extends React.Component {
 
     // 객체에 변화가 생겼을 때 발생하는 이벤트
     onObjectChange = (event) => {
-        //console.log(event.target.object.scale);
-        //console.log(event.target.object.position);
-        //console.log(event.target.object.rotation);
+        this.onChange({
+            assetsId: event.target.object.userData.assetsId,
+            position: event.target.object.position,
+            scale: event.target.object.scale,
+            rotation: event.target.object.rotation
+        });
     };
     
 }
 
-export default Viewer4;
+const mapStateToProps = (state) => ({
+    alarmList: state.mapchanger.alarmList,
+    changeObject: state.mapchanger.changeObject
+});
+
+export default connect(
+    mapStateToProps
+)(Viewer4);  
+
+//export default Viewer4;

@@ -52,19 +52,19 @@ function Content(viewer) {
             this.scene.add(object); 
 
             // 위치 이동 테스트
-            object.position.x = 61.98722088352751;
-            object.position.y = 5.4783316322420355;
-            object.position.z = -46.86617214438609;
+            //object.position.x = 61.98722088352751;
+            //object.position.y = 5.4783316322420355;
+            //object.position.z = -46.86617214438609;
 
             // 크기 변경 테스트
-            object.scale.x = 3.4606686643039932;
-            object.scale.y = 3.4606686643039932;
-            object.scale.z = 3.4606686643039932;
+            //object.scale.x = 3.4606686643039932;
+            //object.scale.y = 3.4606686643039932;
+            //object.scale.z = 3.4606686643039932;
 
             // 회전 변경 테스트
-            object.rotation.x = 0.205751883458614;
-            object.rotation.y = -0.7107763378877161;
-            object.rotation.z = -0.05819872471980264;
+            //object.rotation.x = 0.205751883458614;
+            //object.rotation.y = -0.7107763378877161;
+            //object.rotation.z = -0.05819872471980264;
 
 		} else {
 
