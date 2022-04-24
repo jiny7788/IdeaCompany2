@@ -40,6 +40,7 @@ class Viewer4 extends React.Component {
         const content = new Content(this);
         scene = content.scene;
         loadedObject = content.loadedObject;
+        renderer = content.renderer;
 
         camera = new THREE.PerspectiveCamera( 30, container.clientWidth / container.clientHeight, 0.1, 1500 );
 		camera.position.set(-35, 70, 100);
@@ -61,7 +62,7 @@ class Viewer4 extends React.Component {
         spotLight.castShadow = false;
         scene.add(spotLight);
         
-        var axes = new THREE.AxisHelper(100);
+        var axes = new THREE.AxesHelper(100);
         scene.add(axes);
 
         // 여기서 model을 load한다. 
@@ -90,8 +91,8 @@ class Viewer4 extends React.Component {
         //content.loader.loadFile('samples/ResidentialBuildingSet/Residential Buildings 001.fbx');
         //content.loader.loadFile('samples/mnogohome/building.obj');
         
-        //content.loader.loadFile('samples/cctv/camera1.obj');
-        //content.loader.loadFile('samples/cctv/Security cameras v4.obj');
+        content.loader.loadFile('samples/cctv/camera1.obj');
+        content.loader.loadFile('samples/cctv/Security cameras v4.obj');
         content.loader.loadFile('samples/cctv/Security cameras.obj');
 
         //content.loader.loadFile('models/fbx/dragon/Dragon_Baked_Actions_fbx_7.4_binary.fbx');
@@ -104,8 +105,8 @@ class Viewer4 extends React.Component {
         //content.loader.loadFile('models/test/cctv_척도.gltf');
         
         renderer = new THREE.WebGLRenderer( { antialias: true } );
-        renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( container.clientWidth, container.clientHeight );
+        renderer.setPixelRatio( window.devicePixelRatio > 1 ? 2 : 1);       // !!!고해상도로 출력할 수 있게 한다. 
         //renderer.shadowMap.enabled = true;
         container.appendChild(renderer.domElement);
         console.log(`container size (${container.clientWidth}, ${container.clientHeight})`);
@@ -148,8 +149,10 @@ class Viewer4 extends React.Component {
 
     componentDidUpdate(prevProps, prevState){
         //console.log("componentDidUpdate: " + JSON.stringify(prevProps) + " " + JSON.stringify(prevState));
-        console.log(this.props.alarmList);
+        //console.log(this.props.alarmList);
         alarmList = this.props.alarmList;
+
+        // 알람 제거 시에는 해당 객체의 Light off를 한번 호출해 줘야 한다.
     }
 
     // 기본 함수
@@ -196,26 +199,27 @@ class Viewer4 extends React.Component {
         loadedObject.forEach( (alarmObject) => {
             if( alarmList.findIndex( (item) => item === alarmObject.userData.assetsId ) >= 0)  
             {   // 알람 자산을 찾으면...
-                this.Light(alarmObject, alarmLight);    
+                this.Light(alarmObject, alarmLight);
             }
 
         });
+
+        this.render1();
     }
 
     Light = (selObject, onoff) => {        
         try {
             if(onoff) 
             {
-                console.log(`turn on : ${selObject.userData.name}(${selObject.userData.assetsId}) `);
                 selObject.traverse( function ( object ) {
-                    if (object.isMesh && object.userData.oldColor) {
-                        object.userData.oldColor = object.material.color.getHex();
+                    if (object.isMesh) {
+                        if(!object.userData.oldColor)   // 기존에 저장된 값이 없으면 저장한다.
+                            object.userData.oldColor = object.material.color.getHex();
                         object.material.color.set(0xff0000);
                     }
                 });
                 this.render1();
             } else {
-                console.log('turn off');
                 selObject.traverse( function ( object ) {
                     if (object.isMesh && object.userData.oldColor) {
                         object.material.color.set(object.userData.oldColor);
@@ -327,8 +331,7 @@ class Viewer4 extends React.Component {
         const container = document.getElementById('viewer');
     
         camera.aspect = container.clientWidth / container.clientHeight;
-        camera.updateProjectionMatrix();
-    
+        camera.updateProjectionMatrix();    
         renderer.setSize(container.clientWidth, container.clientHeight);
 
         //console.log(`Resize (${container.clientWidth}, ${container.clientHeight})`);
@@ -468,7 +471,8 @@ class Viewer4 extends React.Component {
                             try {
                                 curObject.traverse(function (object) {
                                     if (object.isMesh) {
-                                        object.userData.oldColor = object.material.color.getHex();
+                                        if(!object.userData.oldColor)   // 기존에 저장된 값이 없으면 저장한다.
+                                            object.userData.oldColor = object.material.color.getHex();
                                         object.material.color.set(0x00ff00);
                                     }
                                 });
