@@ -1,23 +1,49 @@
-import {ADDALARM, REMOVEALARM, CHANGEOBJECT} from '../actions/MapActions';
+import {ADDALARM, REMOVEALARM, CHANGEOBJECT, ADDMAP, REMOVEMAP, ADDASSET, REMOVEASSET, SAVEMAP} from '../actions/MapActions';
 import { handleActions } from 'redux-actions';
 
 const initialState = {
-    alarmList: [],
-    changeObject: {}
+    addAssetsId: '',
+    removeAssetsId: '',
+    changeObject: {},
+    addMap: {},
+    removeMap: {},
+    addAsset: {},
+    removeAsset: {},
+    saveMap: false
 };
 
 
 export const mapchanger = handleActions({
-    ADDALARM: (state, action) =>({
-        ...state,
-        alarmList: state.alarmList.concat(action.payload)
+    ADDALARM: (state, action) => ({
+        ...initialState,
+        addAssetsId: action.payload
     }),
     REMOVEALARM: (state, action) => ({
-        ...state,
-        alarmList: state.alarmList.filter( (item) => (action.payload.findIndex( (element) => element === item ) ) < 0  )
+        ...initialState,
+        removeAssetsId: action.payload
     }),
     CHANGEOBJECT: (state, action) => ({
-        ...state,
+        ...initialState,
         changeObject: action.payload
+    }),
+    ADDMAP: (state, action) => ({
+        ...initialState,
+        addMap: action.payload
+    }),
+    REMOVEMAP: (state, action) => ({
+        ...initialState,
+        removeMap: action.payload
+    }),
+    ADDASSET: (state, action) => ({
+        ...initialState,
+        addAsset: action.payload
+    }),
+    REMOVEASSET: (state, action) => ({
+        ...initialState,
+        removeAsset: action.payload
+    }),
+    SAVEMAP: (state, action) => ({
+        ...initialState,
+        saveMap: action.payload
     })
 }, initialState);
