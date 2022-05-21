@@ -1,21 +1,20 @@
-import * as THREE from 'three';
+import {Box3, Vector3} from 'three';
 import { Loader } from "./Loader";
-import AlarmApi from "../apis/AlarmApi";
+import TDLocationApi from "../apis/AlarmApi";
+
+import { tdCommon } from './TDCommon';
 
 function Content(viewer) {
 
     // init
     this.loader = new Loader(this);
-    this.scene = new THREE.Scene();
-    this.scene.name = 'Scene';
-    this.mixer = new THREE.AnimationMixer( this.scene );
     this.loadedObject = [];    
-    this.id = 1;
     this.defaultMap = null;
+    this.viewer = viewer;
     
     this.addObject = function (object, position, scale, rotation, bSelect) {
 
-        console.log(object);
+        //? console.log(object);
         // Array에 추가해 준다.
         this.loadedObject.push(object);
 
@@ -26,14 +25,10 @@ function Content(viewer) {
             }
         });
 
-        // object에 userdata를 추가한다. 여기서 assetsId, assetsNam을 채워준다.
-        //object.userData.draggable = true;
-        //object.userData.assetsId = this.id ++;      //? 이거 수정해야 함.
-
         // 객체의 크기를 계산한다. (객체를 감싸는 Box를 구하고 대각선 사이의 거리를 구한다.)
-        let bbox = new THREE.Box3().setFromObject(object);
+        let bbox = new Box3().setFromObject(object);
         let distance = bbox.max.distanceTo(bbox.min);
-        //console.log('모델크기', distance);
+        //console.log(`모델 크기: (${bbox.min.x}, ${bbox.min.y}, ${bbox.min.z})-(${bbox.max.x}, ${bbox.max.x}, ${bbox.max.x}) : ${distance}`);
         
         // 크기에 맞춰 확대/축소
         let scaleVal = 20.0 / distance;             // 무조건 20 크기가 되게 만든다. 너무 크게 나오거나 작게 나오면 편집할 수가 없다.
@@ -42,14 +37,11 @@ function Content(viewer) {
 
         // 위치 이동 : 땅 밑으로 가 있는 객체의 경우 땅 바닥에 붙인다. 
         // 위치 이동을 위해 확대/축소된 객체의 좌표를 다시 구한 후 y 좌표를 0으로 맞춘다. 
-        bbox = new THREE.Box3().setFromObject(object);
+        bbox = new Box3().setFromObject(object);
         if (bbox.min.y < 0) {  // 땅 밑으로 가 있는 객체만 위로 올린다.
             //console.log('Groud로 이동', scaleVal);
             object.position.y -= bbox.min.y;
         }
-
-        // scene에 추가해 준다.
-        this.scene.add(object); 
 
         // 위치 이동
         if (position) {
@@ -75,15 +67,59 @@ function Content(viewer) {
             object.rotation.z = rotation._z;
             object.rotation.order = rotation._order;
         }
-        
-		// render() 호출 : animate로 되어 있지 않은 경우 다시 rendering 하도록 호출해 준다.
-        viewer.render1();
+
+        // bbox = new Box3().setFromObject(object);
+        // distance = bbox.max.distanceTo(bbox.min);
+        // console.log(`모델 표시 크기: (${bbox.min.x}, ${bbox.min.y}, ${bbox.min.z})-(${bbox.max.x}, ${bbox.max.x}, ${bbox.max.x}) : ${distance}`);
+
+        // scene에 추가해 준다.
+        tdCommon.scene.add(object); 
+
+        // 전체 사이즈 계산 & 카메라 이동 (Edit 모드가 아닌 경우만 카메라 이동 시킨다.)
+        if (! viewer.editMode)
+            this.moveCamera();
+
+		// draw() 호출 : animate로 되어 있지 않은 경우 다시 rendering 하도록 호출해 준다.
+        viewer.draw();
 
         // 신규 추가인 경우 select 상태로 추가해 준다.
         if (bSelect) {
             viewer.clearSelect();
             viewer.setSelect(object);
         }
+    };
+
+    this.moveCamera = function () {
+        let min = new Vector3();
+        let max = new Vector3();
+        let bbox = null;
+
+        this.loadedObject.forEach(item => {
+            bbox = new Box3().setFromObject(item);
+            //console.log(item);
+
+            if (min.x > bbox.min.x || min.x === 0) min.x = bbox.min.x;
+            if (min.y > bbox.min.y || min.y === 0) min.y = bbox.min.y;
+            if (min.z > bbox.min.z || min.z === 0) min.z = bbox.min.z;
+
+            if (max.x < bbox.max.x) max.x = bbox.max.x;
+            if (max.y < bbox.max.y) max.y = bbox.max.y;
+            if (max.z < bbox.max.z) max.z = bbox.max.z;            
+        });
+
+        let resultBox = new Box3(min, max);
+        //console.log(`전체사이즈 : (${min.x}, ${min.y}, ${min.z})-(${max.x}, ${max.y}, ${max.z}) : ${max.distanceTo(min)}`);
+
+        let cameraPos = new Vector3();
+        cameraPos.x = Math.round((max.x - min.x) / 2);                                                                               // x위치는 가운데로 잡는다. 
+        cameraPos.y = max.y + Math.round(((max.z - min.z) * Math.tan((90 - 25) * Math.PI / 180)) / 2);                               // 카메라의 시야각을 기준으로 tangent로 계산함
+        //cameraPos.z = max.z + Math.round(((max.x - min.x) * Math.tan((90 - 25) * Math.PI / 180)) / 2);
+        cameraPos.z = Math.round((max.z - min.z) / 2) + Math.round(((max.x - min.x) * Math.tan((90 - 25) * Math.PI / 180)) / 2);     // 카메라의 시야각을 기준으로 tangent로 계산함   
+        //console.log(`카메라 위치 계산 : (${cameraPos.x}, ${cameraPos.y}, ${cameraPos.z})`);
+       
+        // Camera Position 이동
+        viewer.camera.position.set(cameraPos.x, cameraPos.y, cameraPos.z);
+        viewer.camera.lookAt(new Vector3(0,0,0)); 
     };
 
     this.StoreData = function () {
@@ -142,16 +178,17 @@ function Content(viewer) {
              mappingList: objArrary
         };
 
-        AlarmApi.setTDMapMapping(mapData).then(response => {
+        TDLocationApi.setTDMapMapping(mapData).then(response => {
             //console.log(response);
         });
 
+        console.log('저장 완료!!!');
         //return JSON.stringify(mapData);
     };
 
     this.LoadData = function () {       // 3D Map Load...
 
-        AlarmApi.getTDMapDetail(viewer.emapInfo.emapId).then(response => {
+        TDLocationApi.getTDMapDetail(viewer.emapInfo.emapId).then(response => {
             if (response.success) { 
                 let objs = JSON.parse(response.result);
                 //console.log(objs);
@@ -198,14 +235,14 @@ function Content(viewer) {
         });
 
         let findObj = null;
-        this.scene.traverse((obj) => {
+        tdCommon.scene.traverse((obj) => {
             if (obj.userData.assetsId && obj.userData.assetsId === asset.assetsId) {
                 findObj = obj;
             }
         });
-        if (findObj) this.scene.remove(findObj);
+        if (findObj) tdCommon.scene.remove(findObj);
 
-        viewer.render1();
+        viewer.draw();
     }
 
     this.addMap = function (map) {
@@ -227,17 +264,37 @@ function Content(viewer) {
         });
 
         let findObj = null;
-        this.scene.traverse((obj) => {
+        tdCommon.scene.traverse((obj) => {
             //console.log(obj);
             if (obj.userData.assetsId && obj.userData.assetsId === map.assetsId) {
                 findObj = obj;
             }
         });
-        if (findObj) this.scene.remove(findObj);
+        if (findObj) tdCommon.scene.remove(findObj);
 
-        viewer.render1();
+        viewer.draw();
     }
 
+    this.removeAll = function () {
+        
+        this.loadedObject.forEach(item => {
+
+            let findObj = null;
+            tdCommon.scene.traverse((obj) => {
+                //console.log(obj);
+                if (obj.userData.assetsId && obj.userData.assetsId === item.userData.assetsId) {
+                    findObj = obj;
+                }
+            });
+            if (findObj) tdCommon.scene.remove(findObj);
+
+        });
+
+        this.loadedObject = [];
+
+        viewer.draw();
+    }
+    
 }
 
 export { Content }; 

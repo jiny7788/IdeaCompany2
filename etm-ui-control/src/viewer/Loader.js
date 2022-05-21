@@ -8,7 +8,7 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 // import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js';
 // import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { unzipSync } from 'three/examples/jsm/libs/fflate.module.js';
-import { DOWN_API_URL } from '../config/api-config';
+import { REST_GW_URL } from '../config/api-config';
 
 
 function Loader( content ) {
@@ -20,7 +20,7 @@ function Loader( content ) {
         let position = loadObject.position;
         let scale = loadObject.scale;
         let rotation = loadObject.rotation;
-        let downPath = DOWN_API_URL + "/api/v2/download/files/" + loadObject.fileSeq;
+        let downPath = REST_GW_URL + "/fileserver/api/v2/download/files/" + loadObject.fileSeq;
 
         const extension = filePath.split('.').pop().toLowerCase();
      
@@ -69,106 +69,138 @@ function Loader( content ) {
             console.log('There was an error loading ' + url);
         };
 
-        switch (extension) {
-            case 'fbx': {                
-                const loader = new FBXLoader(manager);
-                loader.load(downPath, function (object) {   
+        // 인증(쿠키) 정보를 포함하여 파일서버로 파일 요청
+        fetch(downPath,
+            {
+                method: 'GET',
+                credentials: 'include'
+            }
+        )
+        .then(response => response.blob())
+        .then(blob => {        
+            let downUrl = URL.createObjectURL(blob);
+            switch (extension) {
+                case 'fbx': {                
+                    const loader = new FBXLoader(manager);
+                    loader.load(downUrl, function (object) {   
+                        
+                        // object에 userdata를 추가한다. 
+                        object.userData = loadObject;                 
+                        
+                        content.addObject(object, position, scale, rotation, bSelect); 
+    
+                    });
+    
+                    break;
+                }
                     
-                    // object에 userdata를 추가한다. 
-                    object.userData = loadObject;                 
+                case 'glb': 
+                case 'gltf': {
+                    const dracoLoader = new DRACOLoader();
+                    dracoLoader.setDecoderPath( 'examples/js/libs/draco/gltf/' );
+    
+                    const loader = new GLTFLoader(manager);
+                    loader.setDRACOLoader( dracoLoader );
+    
+                    // // 압축이 틀린 경우 처리 필요 : ktx2///
+                    // const ktx2Loader = new KTX2Loader()
+                    // 	.setTranscoderPath( 'three/examples/js/libs/basis/' );
+                    // loader.setKTX2Loader( ktx2Loader );
+                    // loader.setMeshoptDecoder( MeshoptDecoder );
+    
+                    loader.load(downUrl, function (result) {
+                        // object에 userdata를 추가한다. 
+                        result.scene.userData = loadObject;
+    
+                        content.addObject(result.scene, position, scale, rotation, bSelect);
+    
+                    });
+    
+                    break;
+                }
                     
-                    content.addObject(object, position, scale, rotation, bSelect); 
-
-                });
-
-                break;
+                case 'ifc': {
+                    const loader = new IFCLoader(manager);
+                     loader.ifcManager.setWasmPath( 'examples/jsm/loaders/ifc' );
+                    loader.load(downUrl, function (ifcModel) {    
+                        // object에 userdata를 추가한다. 
+                        ifcModel.userData = loadObject;
+    
+                        content.addObject( ifcModel, position, scale, rotation, bSelect );
+                    });
+    
+                    break;
+                }
+    
+                case 'obj': {
+                    const loader = new OBJLoader(manager);
+                    loader.load(downUrl, function (object) {    
+                        // object에 userdata를 추가한다. 
+                        object.userData = loadObject;
+    
+                        content.addObject( object, position, scale, rotation, bSelect );
+                    });
+    
+                    break;
+                }
+                    
+                case 'zip': {
+                    loadXHR(downUrl)
+                        .then(resultBlob => {
+                            //const url = URL.createObjectURL(resultBlob);
+                            //return url;
+                            const reader = new FileReader();
+                            reader.addEventListener( 'load', function ( event ) {
+    
+                                handleZIP( event.target.result, content, loadObject, bSelect);
+    
+                            }, false );
+                            reader.readAsArrayBuffer(resultBlob);
+    
+                        })
+                        .then(url => {
+                            // URL.revokeObjectURL(url);
+                        });                        
+                    
+                    break;
+                }
+                    
+                case 'jpg': 
+                case 'gif': 
+                case 'png': {
+                    const loader = new THREE.TextureLoader();
+                    const texture = loader.load(downUrl, () => {    
+                        content.viewer.draw();                    
+                    });
+    
+                    // texture를 가지고 Group을 만들어 추가한다.
+                    const cylinder1 = new THREE.Mesh(
+                        new THREE.CylinderGeometry(5.2, 5.2, 0.4, 32),
+                        new THREE.MeshStandardMaterial({ color: 0x0fff0f })
+                    );
+                    cylinder1.rotation.set(THREE.MathUtils.degToRad(90), 0, 0);
+    
+                    const cylinder2 = new THREE.Mesh(
+                        new THREE.CylinderGeometry(5, 5, 0.5, 32),
+                        new THREE.MeshStandardMaterial({ map: texture })
+                    );
+                    cylinder2.rotation.set(THREE.MathUtils.degToRad(90), 0, 0);
+    
+                    const group = new THREE.Group();
+                    group.add(cylinder1, cylinder2);                
+                    
+                    // group에 userdata를 추가한다. 
+                    group.userData = loadObject;
+    
+                    content.addObject( group, position, scale, rotation, bSelect );
+    
+                    break;
+                }
             }
-                
-            case 'glb': 
-            case 'gltf': {
-                const dracoLoader = new DRACOLoader();
-				dracoLoader.setDecoderPath( 'three/examples/js/libs/draco/gltf/' );
-
-				const loader = new GLTFLoader(manager);
-				loader.setDRACOLoader( dracoLoader );
-
-                // // 압축이 틀린 경우 처리 필요 : ktx2///
-                // const ktx2Loader = new KTX2Loader()
-				// 	.setTranscoderPath( 'three/examples/js/libs/basis/' );
-                // loader.setKTX2Loader( ktx2Loader );
-                // loader.setMeshoptDecoder( MeshoptDecoder );
-
-                loader.load(downPath, function (result) {
-                    // object에 userdata를 추가한다. 
-                    result.scene.userData = loadObject;
-
-                    content.addObject(result.scene, position, scale, rotation, bSelect);
-
-                });
-
-                break;
-            }
-                
-            case 'ifc': {
-                const loader = new IFCLoader(manager);
-			 	loader.ifcManager.setWasmPath( 'three/examples/jsm/loaders/ifc' );
-                loader.load(downPath, function (ifcModel) {    
-                    // object에 userdata를 추가한다. 
-                    ifcModel.userData = loadObject;
-
-                    content.addObject( ifcModel, position, scale, rotation, bSelect );
-                });
-
-                break;
-            }
-
-            case 'obj': {
-                //const mtlloader = new MTLLoader();
-                //mtlloader.load('samples/Independent.mtl', function (materials ) {
-                //    const loader = new OBJLoader(manager);
-                //    loader
-                //        .setMaterials( materials )
-                //        .load(downPath, function (object) {    
-                //        // object에 userdata를 추가한다. 
-                //        object.userData.name = downPath;
-                //
-                //        content.addObject( object );
-                //    });
-                //});
-
-                const loader = new OBJLoader(manager);
-                loader.load(downPath, function (object) {    
-                    // object에 userdata를 추가한다. 
-                    object.userData = loadObject;
-
-                    content.addObject( object, position, scale, rotation, bSelect );
-                });
-
-                break;
-            }
-                
-            case 'zip': {
-                loadXHR(downPath)
-                    .then(resultBlob => {
-                        //const url = URL.createObjectURL(resultBlob);
-                        //return url;
-                        const reader = new FileReader();
-                        reader.addEventListener( 'load', function ( event ) {
-
-                            handleZIP( event.target.result, content, loadObject, bSelect);
-
-                        }, false );
-                        reader.readAsArrayBuffer(resultBlob);
-
-                    })
-                    .then(url => {
-                        // URL.revokeObjectURL(url);
-                    });                        
-                
-                break;
-            }
-        }
-
+        })
+        .catch(error => {
+            console.log(error);
+        });
     }; 
 
 }
@@ -217,15 +249,6 @@ function handleZIP(contents, content, loadObject, bSelect) {
 
                 content.addObject(object, position, scale, rotation, bSelect); 
                 
-                // animaton을 scene에 추가 해준다. 
-                //content.scene.animations.push(...object.animations);
-
-                // animation이 있으면 플레이 시켜준다.  
-                if (object.animations.length > 0) {
-                    //console.log(object.animations);
-                    //content.mixer.clipAction(object.animations[0]).play();
-                }
-                    
                 break;
             }
 
@@ -245,18 +268,6 @@ function handleZIP(contents, content, loadObject, bSelect) {
 
                     content.addObject(result.scene, position, scale, rotation, bSelect);
 
-                     // animaton을 scene에 추가 해준다. 
-                     //content.scene.animations.push(...result.animations);
-
-                    // animation이 있으면 플레이 시켜준다.  
-                    if (result.animations.length > 0) {
-                        //console.log(result.animations);
-                        //content.mixer.clipAction(result.animations[0]).play();
-
-                        // 객체 쪽으로 animation을 복사해 준다. 
-                        //(gltf는 하부에 animations를 가지고 있음)
-                        result.scene.animations.push(...result.animations);
-                    }
                 } );
 
                 break;
