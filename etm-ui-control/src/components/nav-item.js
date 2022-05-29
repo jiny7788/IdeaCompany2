@@ -40,7 +40,7 @@ export const NavItem = (props) => {
             backgroundColor: 'rgba(255,255,255, 0.08)'
           }
         }}
-        onClick={() => { navigate(href) } }
+        onClick={() => { navigate(`${href}`) } }
         >
           <Box sx={{ flexGrow: 1 }}>
             {title}

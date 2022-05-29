@@ -15,7 +15,6 @@ const DashboardLayoutRoot = styled('div')(({ theme }) => ({
   
 export const DashboardLayout = (props) => {
     const { children } = props;
-    console.log(props);
   
     return (
       <>

@@ -15,43 +15,43 @@ import { NavItem } from './nav-item';
 
 const items = [
   {
-    href: '/',
-    icon: <ChartBarIcon fontSize="small" />,
-    title: 'Dashboard'
+    href: '/knowledges',
+    icon: (<ChartBarIcon fontSize="small" />),
+    title: '지식창고'
   },
   {
     href: '/customers',
-    icon: <UsersIcon fontSize="small" />,
+    icon: (<UsersIcon fontSize="small" />),
     title: 'Customers'
   },
   {
     href: '/products',
-    icon: <ShoppingBagIcon fontSize="small" />,
+    icon: (<ShoppingBagIcon fontSize="small" />),
     title: 'Products'
   },
   {
     href: '/account',
-    icon: <UserIcon fontSize="small" />,
+    icon: (<UserIcon fontSize="small" />),
     title: 'Account'
   },
   {
     href: '/settings',
-    icon: <CogIcon fontSize="small" />,
+    icon: (<CogIcon fontSize="small" />),
     title: 'Settings'
   },
   {
     href: '/login',
-    icon: <LockIcon fontSize="small" />,
+    icon: (<LockIcon fontSize="small" />),
     title: 'Login'
   },
   {
     href: '/register',
-    icon: <UserAddIcon fontSize="small" />,
+    icon: (<UserAddIcon fontSize="small" />),
     title: 'Register'
   },
   {
     href: '/404',
-    icon: <XCircleIcon fontSize="small" />,
+    icon: (<XCircleIcon fontSize="small" />),
     title: 'Error'
   }
 ];
