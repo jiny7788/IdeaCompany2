@@ -100,3 +100,19 @@ CREATE TABLE mytest.tb_board (
 	counts int8 NULL,
 	CONSTRAINT pk_tb_boar PRIMARY KEY (board_no)
 );
+
+CREATE TABLE mytest.tb_file (
+	file_seq bigserial NOT NULL,
+	file_name varchar(100) NOT NULL,
+	save_file_name varchar(100) NOT NULL,
+	save_path varchar(500) NOT NULL,
+	use_yn bpchar(1) NOT NULL,
+	reg_usr_no int8 NOT NULL,
+	reg_date timestamptz NOT NULL,
+	mod_usr_no int8 NULL,
+	mod_date timestamptz NULL,
+	hash varchar(300) NULL,
+	bucket varchar(100) NULL,
+	storage_type varchar(100) NULL,
+	CONSTRAINT pk_tb_filele PRIMARY KEY (file_seq)
+)
