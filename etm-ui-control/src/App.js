@@ -9,6 +9,9 @@ import { DashboardLayout } from './components/DashboardLayout';
 import Customers from './pages/customer';
 import Products from './pages/products';
 import NotFound from './pages/404';
+import Knowledges from './pages/Knowledges';
+import ReadKnowledge from './components/knowledge/ReadKnowledge';
+import CreateKnowledge from './components/knowledge/CreateKnowledge';
 
 class App extends Component {
   
@@ -20,9 +23,13 @@ class App extends Component {
           <CssBaseline />
           <DashboardLayout>
           <Routes>
-              <Route path="/" element={<Customers />}></Route>
-              <Route path="/products" element={<Products />}></Route>
-              <Route path="*" element={<NotFound />}></Route>
+              <Route path="/" element={<Customers />} />
+              <Route path="/knowledges" element={<Knowledges />} />
+              <Route path="/knowledges/:pageno" element={<Knowledges />} />
+              <Route path="/read-knowledge/:no&:pageno" element={ <ReadKnowledge />} />
+              <Route path="/create-knowledge/:no&:pageno" element={ <CreateKnowledge />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="*" element={<NotFound />} />
           </Routes>            
           </DashboardLayout>
         </ThemeProvider>      

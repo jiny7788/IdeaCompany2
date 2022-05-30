@@ -24,7 +24,7 @@ import {
           sx={{ m: 1 }}
           variant="h4"
         >
-          지식장고
+          지식창고
         </Typography>
         <Box sx={{ m: 1 }}>
           <Button

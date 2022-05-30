@@ -14,10 +14,13 @@ import {
 import BoardService from '../../apis/BoardService';
 import {useNavigate} from "react-router-dom";
 
-export const KnowledgeList = () => {
+export const KnowledgeList = (props) => {
+  let {pageno} = props;
+  if( pageno===undefined ) pageno=1;
+
   const [limit, setLimit] = useState(10);
   const [pageInfo, setPageInfo] = useState({
-    p_num: 1,
+    p_num: pageno,
     paging: {
       "currentPageNum": 1,
       "objectCountTotal": 37,
@@ -67,7 +70,7 @@ export const KnowledgeList = () => {
 
   const navigate = useNavigate();
   const readKnowledge = (no) => {
-    console.log(`readBoard(${no}&${pageInfo.p_num})`);
+    console.log(`readKnowledge(${no}&${pageInfo.p_num})`);
     navigate(`/read-knowledge/${no}&${pageInfo.p_num}`);
   };
 

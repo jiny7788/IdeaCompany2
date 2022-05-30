@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import BoardService from "../../apis/BoardService"
+import { useParams, useNavigate } from 'react-router-dom';
+import { Box, Card, Container, Typography, Button } from '@mui/material';
 
-const ReadKnowledge = ({ match }) => {
-  const {no, pageno} = match.params;
+
+const ReadKnowledge = () => {
+  const {no, pageno} = useParams();
   const [data, setData] = useState({
     no: no,
     pageNo: pageno,
     board: {},
   });
+  const navigate = useNavigate();
 
   useEffect(() => {
     BoardService.getOneBoard(data.no).then((res) => {
@@ -16,6 +20,8 @@ const ReadKnowledge = ({ match }) => {
         board: res.data 
       });
     });
+    console.log(data);
+
     return () => {
       //console.log('컴포넌트가 화면에서 사라짐');
     };
@@ -36,11 +42,11 @@ const ReadKnowledge = ({ match }) => {
 
   const goToList = () => {
     //console.log(data);
-    history.push(`/base/tables/${data.pageNo}`);
+    navigate(`/knowledges/${data.pageNo}`);
   };
 
   const goToUpdate = () => {
-    history.push(`/create-board/${data.no}&${data.pageNo}`);
+    navigate(`/create-knowledge/${data.no}&${data.pageNo}`);
   };
 
   const deleteView = async () => {
@@ -58,7 +64,7 @@ const ReadKnowledge = ({ match }) => {
         }
       });
     }
-  };
+  };  
 
   const Viewer = ({content}) => (
     <div
@@ -67,60 +73,33 @@ const ReadKnowledge = ({ match }) => {
   );
 
   return (
-    <CRow>
-      <CCol xs={12}>
-        <CCard className="mb-4">
-          <CCardHeader>
-            <strong>게시판 읽기</strong>
-          </CCardHeader>
-          <CCardBody>
-            <div>
-              <CForm>
-                <div className="mb-3">
-                  <CFormLabel htmlFor="Input1">Board Type</CFormLabel>
-                  <CFormInput
-                    type="text"
-                    id="Input1"
-                    value={returnBoardType(data.board.type)}
-                    readOnly
-                  />
-                </div>
-                <div className="mb-3">
-                  <CFormLabel htmlFor="Input2">Title</CFormLabel>
-                  <CFormInput
-                    type="text"
-                    id="Input2"
-                    value={data.board.title}
-                    readOnly
-                  />
-                </div>
-                <div className="mb-3">
-                  <CFormLabel htmlFor="Input3">Contents</CFormLabel>
-                  <CCard className="mb-4">
-                    <CCardBody>
-                      <Viewer content={data.board.contents}/>  
-                    </CCardBody>
-                  </CCard>                  
-                </div>
-                <div className="mb-3">
-                  <CFormLabel htmlFor="Input4">Member No</CFormLabel>
-                  <CFormInput
-                    type="text"
-                    id="Input4"
-                    value={data.board.memberNo}
-                    readOnly
-                  />
-                </div>
-              </CForm>
-              <CButton color="info" onClick={() => goToList() }>글 목록으로 이동</CButton>{" "}
-              <CButton color="info" onClick={() => goToUpdate() }>글 수정</CButton>{" "}
-              <CButton color="info" onClick={() => deleteView()}>글 삭제</CButton>
-            </div>
-          </CCardBody>
-        </CCard>
-      </CCol>  
-    </CRow>
-  )
-}
+      <Container maxWidth={false}>
+        <Box sx={{ mt: 3 }}>
+          <Card>
+            <Typography variant="h5" component="div">
+              {returnBoardType(data.board.type)}
+            </Typography>
+          </Card>          
+        </Box> 
+        <Box sx={{ mt: 3 }}>
+          <Card>
+            <Typography variant="h5" component="div">
+              제목 : {data.board.title}
+            </Typography>
+          </Card>          
+        </Box>  
+        <Box sx={{ mt: 3 }}>
+          <Viewer content={data.board.contents}/>
+        </Box>  
+        <Box sx={{ mt: 3 }}>   
+          <Container maxWidth={false}>
+            <Button variant="outlined" onClick={() => goToList() }>글 목록으로 이동</Button>{" "}
+            <Button variant="outlined" onClick={() => goToUpdate() }>글 수정</Button>{" "}
+            <Button variant="outlined" onClick={() => deleteView()}>글 삭제</Button>     
+          </Container>          
+        </Box>
+      </Container>
+  );
+};
 
-export default ReadKnowledge
+export default ReadKnowledge;
