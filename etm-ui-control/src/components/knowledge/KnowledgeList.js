@@ -70,7 +70,7 @@ export const KnowledgeList = (props) => {
 
   const navigate = useNavigate();
   const readKnowledge = (no) => {
-    console.log(`readKnowledge(${no}&${pageInfo.p_num})`);
+    //console.log(`readKnowledge(${no}&${pageInfo.p_num})`);
     navigate(`/read-knowledge/${no}&${pageInfo.p_num}`);
   };
 

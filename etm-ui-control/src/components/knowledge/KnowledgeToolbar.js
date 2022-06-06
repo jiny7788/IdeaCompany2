@@ -8,8 +8,16 @@ import {
     SvgIcon, Typography
   } from '@mui/material';
   import { Search as SearchIcon } from '../../icons/search';
+  import { useNavigate } from 'react-router-dom';
   
-  export const KnowledgeToolbar = (props) => (
+  export const KnowledgeToolbar = (props) => {
+    const navigate = useNavigate();
+
+    const goToUpdate = () => {
+      navigate(`/create-knowledge`);
+    };
+
+    return (
     <Box {...props}>
       <Box
         sx={{
@@ -30,6 +38,7 @@ import {
           <Button
             color="primary"
             variant="contained"
+            onClick={goToUpdate}
           >
             신규
           </Button>
@@ -62,4 +71,4 @@ import {
       </Box>
     </Box>
   );
-  
+}

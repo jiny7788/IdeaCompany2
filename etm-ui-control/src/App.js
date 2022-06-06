@@ -28,6 +28,7 @@ class App extends Component {
               <Route path="/knowledges/:pageno" element={<Knowledges />} />
               <Route path="/read-knowledge/:no&:pageno" element={ <ReadKnowledge />} />
               <Route path="/create-knowledge/:no&:pageno" element={ <CreateKnowledge />} />
+              <Route path="/create-knowledge" element={ <CreateKnowledge />} />
               <Route path="/products" element={<Products />} />
               <Route path="*" element={<NotFound />} />
           </Routes>            

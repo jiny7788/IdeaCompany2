@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import BoardService from "../../apis/BoardService"
 import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Card, Container, Typography, Button } from '@mui/material';
+import TextEditor from '../../components/TextEditor';
+
 
 
 const ReadKnowledge = () => {
@@ -19,8 +21,8 @@ const ReadKnowledge = () => {
         ...data,
         board: res.data 
       });
-    });
-    console.log(data);
+//      console.log(data);
+    });    
 
     return () => {
       //console.log('컴포넌트가 화면에서 사라짐');
@@ -58,7 +60,8 @@ const ReadKnowledge = () => {
       BoardService.deleteBoard(data.no).then((res) => {
         //console.log("delete result => " + JSON.stringify(res));
         if (res.status == 200) {
-          history.push(`/base/tables/${data.pageNo}`);
+          //history.push(`/base/tables/${data.pageNo}`);
+          navigate(`/knowledges/${data.pageNo}`);
         } else {
           alert("글 삭제가 실패했습니다.");
         }
@@ -71,6 +74,10 @@ const ReadKnowledge = () => {
       dangerouslySetInnerHTML={{ __html: content }}
     ></div>
   );
+
+  const onChange = (data) => {
+    //console.log(data);
+  };
 
   return (
       <Container maxWidth={false}>
@@ -88,9 +95,13 @@ const ReadKnowledge = () => {
             </Typography>
           </Card>          
         </Box>  
-        <Box sx={{ mt: 3 }}>
-          <Viewer content={data.board.contents}/>
-        </Box>  
+          {
+            /*
+              < Viewer content = {data.board.contents} />
+            */
+            //console.log(data.board)
+          }
+          <TextEditor value={data.board.contents} readOnly={true} onChange={onChange} /> 
         <Box sx={{ mt: 3 }}>   
           <Container maxWidth={false}>
             <Button variant="outlined" onClick={() => goToList() }>글 목록으로 이동</Button>{" "}
