@@ -7,7 +7,17 @@ class TextEditor extends Component {
         const {value, onChange, readOnly} = this.props;
         const custom_config = {
             ...Editor.defaultConfig,
-           extraPlugins: [ MyCustomUploadAdapterPlugin ],
+            htmlSupport: {                  // html tag들이 filtering되지 않도록 설정한다. 
+                allow: [
+                  {
+                    name: /.*/,
+                    attributes: true,
+                    classes: true,
+                    styles: true
+                  }
+                ]
+            },
+           extraPlugins: [ MyCustomUploadAdapterPlugin ],   // image 파일 upload를 위한 custom upload 등록
         };
 
         //console.log(custom_config);
